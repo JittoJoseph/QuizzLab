@@ -1,7 +1,7 @@
 // src/components/QuizSetup.jsx
 import React, { useState } from 'react';
 
-const QuizSetup = () => {
+const QuizSetup = ({ onSubmit }) => {
 	const [formData, setFormData] = useState({
 		topic: '',
 		difficulty: 'intermediate'
@@ -9,8 +9,7 @@ const QuizSetup = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		// Handle quiz start logic later
-		console.log(formData);
+		onSubmit(formData);
 	};
 
 	return (
@@ -45,7 +44,9 @@ const QuizSetup = () => {
 									value={formData.topic}
 									onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
 									placeholder="Enter any topic (e.g., Photosynthesis)"
-									className="w-full px-4 py-3 rounded-lg border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									className="w-full px-4 py-3 rounded-lg border border-blue-200 
+										focus:outline-none focus:ring-2 focus:ring-blue-500 
+										bg-transparent text-blue-900 placeholder-blue-400"
 									required
 								/>
 							</div>
@@ -59,7 +60,9 @@ const QuizSetup = () => {
 									id="difficulty"
 									value={formData.difficulty}
 									onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
-									className="w-full px-4 py-3 rounded-lg border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+									className="w-full px-4 py-3 rounded-lg border border-blue-200 
+										focus:outline-none focus:ring-2 focus:ring-blue-500 
+										bg-transparent text-blue-900"
 								>
 									<option value="beginner">Beginner</option>
 									<option value="intermediate">Intermediate</option>
