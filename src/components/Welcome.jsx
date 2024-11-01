@@ -24,7 +24,7 @@ const Welcome = ({ onStartClick }) => {
 				<div className="md:hidden">
 					<button
 						onClick={toggleMenu}
-						className="text-blue-700 focus:outline-none"
+						className="text-blue-700 focus:outline-none bg-transparent"
 					>
 						{isMenuOpen ? <X size={24} /> : <Menu size={24} />}
 					</button>

@@ -6,10 +6,13 @@ const QuizSetup = ({ onSubmit }) => {
 		topic: '',
 		difficulty: 'intermediate'
 	});
+	const [isLoading, setIsLoading] = useState(false);
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		onSubmit(formData);
+		setIsLoading(true);
+		await onSubmit(formData);
+		setIsLoading(false);
 	};
 
 	return (
@@ -73,9 +76,18 @@ const QuizSetup = ({ onSubmit }) => {
 							{/* Submit Button */}
 							<button
 								type="submit"
-								className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+								disabled={isLoading}
+								className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 
+									transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
 							>
-								Generate Quiz
+								{isLoading ? (
+									<div className="flex items-center justify-center space-x-2">
+										<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+										<span>Generating Quiz...</span>
+									</div>
+								) : (
+									'Generate Quiz'
+								)}
 							</button>
 						</form>
 
