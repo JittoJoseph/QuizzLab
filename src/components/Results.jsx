@@ -1,13 +1,33 @@
 // src/components/Results.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
+import Confetti from 'react-confetti';
 
 const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onRetry, onNewQuiz }) => {
-	// Ensure percentage calculation is valid
 	const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
+	const isExcellentScore = percentage >= 90;
+
+	// Google brand colors
+	const googleColors = [
+		'#4285F4', // Google Blue
+		'#DB4437', // Google Red
+		'#F4B400', // Google Yellow
+		'#0F9D58', // Google Green
+	];
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
+			{isExcellentScore && (
+				<Confetti
+					recycle={false}
+					numberOfPieces={300}
+					gravity={0.3}
+					colors={googleColors}
+					tweenDuration={5000}
+					width={window.innerWidth}
+					height={window.innerHeight}
+				/>
+			)}
 			{/* Header */}
 			<div className="px-4 md:px-8 py-6">
 				<div className="flex items-center space-x-2">

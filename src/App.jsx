@@ -88,6 +88,9 @@ function App() {
 					onNewQuiz={handleNewQuiz}
 				/>
 			)}
+			{currentPage === 'features' && (
+				<Features onBack={() => setCurrentPage('welcome')} />
+			)}
 		</>
 	)
 }

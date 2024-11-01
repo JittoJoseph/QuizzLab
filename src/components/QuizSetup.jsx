@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 const ToggleSwitch = ({ checked, onChange }) => (
 	<div className="flex items-center space-x-3 mt-6 bg-blue-50 p-3 rounded-lg">
 		<button
+			type="button" // Add this to prevent form submission
 			role="switch"
 			aria-checked={checked}
 			onClick={() => onChange(!checked)}

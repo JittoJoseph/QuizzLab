@@ -43,10 +43,16 @@ const Welcome = ({ onStartClick }) => {
           space-y-2 md:space-y-0 md:space-x-4 
           p-4 md:p-0
         `}>
-					<button className="text-blue-700 hover:text-blue-900 font-semibold bg-transparent block w-full md:w-auto text-left">
+					<button
+						onClick={() => window.open('https://github.com/JittoJoseph/QuizzyAI', '_blank')}
+						className="text-blue-700 hover:text-blue-900 font-semibold bg-transparent block w-full md:w-auto text-left"
+					>
 						About
 					</button>
-					<button className="text-blue-700 hover:text-blue-900 font-semibold bg-transparent block w-full md:w-auto text-left">
+					<button
+						onClick={() => onNavigate('features')}
+						className="text-blue-700 hover:text-blue-900 font-semibold bg-transparent block w-full md:w-auto text-left"
+					>
 						Features
 					</button>
 				</div>
@@ -131,7 +137,7 @@ const Welcome = ({ onStartClick }) => {
 			<footer className="bg-blue-800 text-white py-6">
 				<div className="container mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
 					<p className="text-center w-full md:w-auto">
-						<a href="#" className="text-white hover:text-blue-200">© 2024 QuizzyAI</a>
+						<a href="https://www.linkedin.com/in/jittojoseph17/" className="text-white hover:text-blue-200">© 2024 Jitto Joseph</a>
 					</p>
 					<div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto text-center">
 						<a href="#" className="text-white hover:text-blue-200 block md:inline">Privacy</a>
