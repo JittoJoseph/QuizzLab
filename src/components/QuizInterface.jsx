@@ -1,6 +1,7 @@
 // src/components/QuizInterface.jsx
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { CheckCircle, XCircle } from 'lucide-react'; // Add this import
 
 const QuizInterface = ({
 	question,

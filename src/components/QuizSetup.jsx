@@ -1,6 +1,32 @@
 // src/components/QuizSetup.jsx
 import React, { useState } from 'react';
 
+const ToggleSwitch = ({ checked, onChange }) => (
+	<div className="flex items-center space-x-3 mt-6 bg-blue-50 p-3 rounded-lg">
+		<button
+			role="switch"
+			aria-checked={checked}
+			onClick={() => onChange(!checked)}
+			className={`relative inline-flex w-10 h-5 rounded-full transition-colors duration-200 ease-in-out
+        ${checked ? 'bg-blue-600' : 'bg-gray-300'}`}
+		>
+			<span
+				className={`absolute top-0.5 left-0.5 inline-block w-4 h-4 rounded-full bg-white 
+        shadow-sm transform transition-transform duration-200 ease-in-out
+        ${checked ? 'translate-x-5' : 'translate-x-0'}`}
+			/>
+		</button>
+		<label className="text-blue-900 text-sm font-medium flex items-center space-x-2">
+			<span>Show instant feedback</span>
+			{checked && (
+				<span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded">
+					Recommended for beginners
+				</span>
+			)}
+		</label>
+	</div>
+);
+
 const QuizSetup = ({ onSubmit }) => {
 	const [formData, setFormData] = useState({
 		topic: '',
@@ -75,18 +101,10 @@ const QuizSetup = ({ onSubmit }) => {
 							</div>
 
 							{/* Instant Feedback Toggle */}
-							<div className="flex items-center space-x-3 mt-4">
-								<input
-									type="checkbox"
-									id="instantFeedback"
-									checked={formData.instantFeedback}
-									onChange={(e) => setFormData({ ...formData, instantFeedback: e.target.checked })}
-									className="w-4 h-4 text-blue-600 rounded border-blue-300 focus:ring-blue-500"
-								/>
-								<label htmlFor="instantFeedback" className="text-blue-900">
-									Show instant feedback (Recommended for beginners)
-								</label>
-							</div>
+							<ToggleSwitch
+								checked={formData.instantFeedback}
+								onChange={(checked) => setFormData({ ...formData, instantFeedback: checked })}
+							/>
 
 							{/* Submit Button */}
 							<button
