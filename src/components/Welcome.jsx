@@ -51,28 +51,10 @@ const Welcome = () => {
 				</div>
 			</nav>
 
-			{/* Hero Section */}
+			{/* Hero Section - Reorganized */}
 			<div className="flex-grow flex items-center container mx-auto px-4 md:px-8 py-8 md:py-16">
-				<div className="flex flex-col-reverse md:flex-row items-center space-y-8 md:space-y-0 md:space-x-12 w-full">
-					{/* Illustration - Mobile First */}
-					<div className="w-full md:w-1/2 flex justify-center md:justify-end">
-						<div className="w-full max-w-md bg-white shadow-2xl rounded-2xl p-6 md:p-8 transform md:rotate-3 hover:rotate-0 transition-transform">
-							<div className="bg-blue-100 rounded-lg p-4 mb-4">
-								<div className="h-4 bg-blue-300 rounded w-3/4 mb-2"></div>
-								<div className="h-4 bg-blue-300 rounded w-1/2"></div>
-							</div>
-							<div className="space-y-3">
-								{[1, 2, 3, 4].map((item) => (
-									<div key={item} className="flex items-center space-x-3">
-										<div className="w-6 h-6 bg-blue-200 rounded-full"></div>
-										<div className="h-4 bg-gray-200 rounded w-full"></div>
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
-
-					{/* Text Content */}
+				<div className="flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-12 w-full">
+					{/* Text Content - Now on Left */}
 					<div className="w-full md:w-1/2 text-center md:text-left space-y-6">
 						<h2 className="text-3xl md:text-5xl font-extrabold text-blue-900 leading-tight">
 							Learn Anything with AI-Powered Quizzes
@@ -81,6 +63,7 @@ const Welcome = () => {
 							Generate custom quizzes on any topic instantly. Perfect for students and lifelong learners.
 						</p>
 
+						{/* Features List */}
 						<div className="space-y-4">
 							{[
 								{ icon: 'check', text: 'Unlimited Quiz Topics' },
@@ -117,6 +100,24 @@ const Welcome = () => {
 							<button className="border-2 bg-transparent border-blue-600 text-blue-700 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-semibold w-full sm:w-auto">
 								How It Works
 							</button>
+						</div>
+					</div>
+
+					{/* Illustration - Now on Right */}
+					<div className="w-full md:w-1/2 flex justify-center md:justify-start">
+						<div className="w-full max-w-md bg-white shadow-2xl rounded-2xl p-6 md:p-8 transform md:rotate-3 hover:rotate-0 transition-transform">
+							<div className="bg-blue-100 rounded-lg p-4 mb-4">
+								<div className="h-4 bg-blue-300 rounded w-3/4 mb-2"></div>
+								<div className="h-4 bg-blue-300 rounded w-1/2"></div>
+							</div>
+							<div className="space-y-3">
+								{[1, 2, 3, 4].map((item) => (
+									<div key={item} className="flex items-center space-x-3">
+										<div className="w-6 h-6 bg-blue-200 rounded-full"></div>
+										<div className="h-4 bg-gray-200 rounded w-full"></div>
+									</div>
+								))}
+							</div>
 						</div>
 					</div>
 				</div>
