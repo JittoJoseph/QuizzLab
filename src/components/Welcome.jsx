@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import PropTypes from 'prop-types';
 
-const Welcome = () => {
+const Welcome = ({ onStartClick }) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	const toggleMenu = () => {
@@ -94,7 +95,10 @@ const Welcome = () => {
 						</div>
 
 						<div className="flex flex-col sm:flex-row justify-center md:justify-start space-y-4 sm:space-y-0 sm:space-x-4 pt-6">
-							<button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold w-full sm:w-auto">
+							<button
+								onClick={onStartClick}
+								className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold w-full sm:w-auto"
+							>
 								Start Learning
 							</button>
 							<button className="border-2 bg-transparent border-blue-600 text-blue-700 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-semibold w-full sm:w-auto">
@@ -138,6 +142,10 @@ const Welcome = () => {
 			</footer>
 		</div>
 	);
+};
+
+Welcome.propTypes = {
+	onStartClick: PropTypes.func.isRequired
 };
 
 export default Welcome;
