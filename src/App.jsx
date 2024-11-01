@@ -3,6 +3,7 @@ import Welcome from './components/Welcome'
 import QuizSetup from './components/QuizSetup'
 import QuizInterface from './components/QuizInterface'
 import Results from './components/Results'
+import { generateQuestions } from './services/ai';
 
 function App() {
 	const [currentPage, setCurrentPage] = useState('welcome')
@@ -19,14 +20,21 @@ function App() {
 		setCurrentPage('quiz-setup')
 	}
 
-	const startQuiz = (formData) => {
-		setQuizData({
-			...quizData,
-			topic: formData.topic,
-			difficulty: formData.difficulty
-		})
-		setCurrentPage('quiz')
-	}
+	const startQuiz = async (formData) => {
+		try {
+			const generatedQuestions = await generateQuestions(formData.topic, formData.difficulty);
+			setQuizData({
+				...quizData,
+				topic: formData.topic,
+				difficulty: formData.difficulty,
+				questions: generatedQuestions.questions
+			});
+			setCurrentPage('quiz');
+		} catch (error) {
+			console.error('Failed to generate questions:', error);
+			// Handle error appropriately
+		}
+	};
 
 	const handleQuizComplete = (finalScore) => {
 		setQuizData({
