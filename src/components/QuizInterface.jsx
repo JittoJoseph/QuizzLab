@@ -2,20 +2,28 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const QuizInterface = ({ onComplete }) => {
+const QuizInterface = ({
+	question,
+	currentQuestion,
+	totalQuestions,
+	onAnswerSubmit,
+	onComplete
+}) => {
 	const [selectedAnswer, setSelectedAnswer] = useState(null);
 
-	// Placeholder data - will be replaced with actual quiz data
-	const mockQuestion = {
-		question: "What is the primary function of photosynthesis in plants?",
-		options: [
-			"Convert light energy into chemical energy",
-			"Release water into the atmosphere",
-			"Absorb minerals from soil",
-			"Produce oxygen only"
-		],
-		correct: 0
+	const handleNext = () => {
+		if (selectedAnswer === null) return;
+
+		const isCorrect = selectedAnswer === question.correct;
+		onAnswerSubmit(isCorrect);
+		setSelectedAnswer(null);
+
+		if (currentQuestion + 1 === totalQuestions) {
+			onComplete();
+		}
 	};
+
+	if (!question) return null;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
@@ -27,43 +35,38 @@ const QuizInterface = ({ onComplete }) => {
 							<div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
 								<span className="text-white font-bold text-xl">Q</span>
 							</div>
-							<span className="text-blue-900 font-semibold">Question 1/10</span>
-						</div>
-						<div className="flex items-center space-x-4">
-							<div className="text-blue-900">
-								<span className="font-semibold">Score:</span> 0
-							</div>
-							<div className="text-blue-900">
-								<span className="font-semibold">Time:</span> 0:30
-							</div>
+							<span className="text-blue-900 font-semibold">
+								Question {currentQuestion + 1}/{totalQuestions}
+							</span>
 						</div>
 					</div>
 					{/* Progress Bar */}
 					<div className="w-full h-2 bg-blue-100 rounded-full mt-4">
-						<div className="w-1/10 h-full bg-blue-600 rounded-full"></div>
+						<div
+							className="h-full bg-blue-600 rounded-full transition-all duration-300"
+							style={{ width: `${((currentQuestion + 1) / totalQuestions) * 100}%` }}
+						></div>
 					</div>
 				</div>
 			</div>
 
-			{/* Main Quiz Content */}
+			{/* Question Content */}
 			<div className="flex-grow flex items-center px-4 md:px-8 py-8">
 				<div className="container mx-auto max-w-3xl">
 					<div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 space-y-6">
-						{/* Question */}
 						<h2 className="text-xl md:text-2xl text-blue-900 font-semibold">
-							{mockQuestion.question}
+							{question.question}
 						</h2>
 
-						{/* Options */}
 						<div className="space-y-3">
-							{mockQuestion.options.map((option, index) => (
+							{question.options.map((option, index) => (
 								<button
 									key={index}
 									onClick={() => setSelectedAnswer(index)}
-									className={`w-full p-4 text-left rounded-xl transition-all
+									className={`w-full p-4 text-left rounded-xl transition-all bg-transparent
                     ${selectedAnswer === index
 											? 'bg-blue-100 border-2 border-blue-600'
-											: 'bg-gray-50 hover:bg-blue-50 border-2 border-transparent'
+											: 'hover:bg-blue-50 border-2 border-transparent'
 										}
                     text-blue-900 font-medium`}
 								>
@@ -77,15 +80,14 @@ const QuizInterface = ({ onComplete }) => {
 							))}
 						</div>
 
-						{/* Navigation */}
-						<div className="flex justify-between pt-6">
-							<button className="px-6 py-2 border-2 border-blue-600 text-blue-700 rounded-lg 
-								hover:bg-blue-50 bg-transparent transition-colors">
-								Previous
-							</button>
-							<button className="px-6 py-2 bg-blue-600 text-white rounded-lg 
-								hover:bg-blue-700 transition-colors">
-								Next
+						<div className="flex justify-end pt-6">
+							<button
+								onClick={handleNext}
+								disabled={selectedAnswer === null}
+								className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+							>
+								{currentQuestion + 1 === totalQuestions ? 'Finish' : 'Next'}
 							</button>
 						</div>
 					</div>
@@ -96,6 +98,15 @@ const QuizInterface = ({ onComplete }) => {
 };
 
 QuizInterface.propTypes = {
+	question: PropTypes.shape({
+		question: PropTypes.string.isRequired,
+		options: PropTypes.arrayOf(PropTypes.string).isRequired,
+		correct: PropTypes.number.isRequired,
+		explanation: PropTypes.string
+	}),
+	currentQuestion: PropTypes.number.isRequired,
+	totalQuestions: PropTypes.number.isRequired,
+	onAnswerSubmit: PropTypes.func.isRequired,
 	onComplete: PropTypes.func.isRequired
 };
 

@@ -15,12 +15,14 @@ function App() {
 		score: 0,
 		answers: []
 	})
+	const [isLoading, setIsLoading] = useState(false)
 
 	const navigateToQuiz = () => {
 		setCurrentPage('quiz-setup')
 	}
 
 	const startQuiz = async (formData) => {
+		setIsLoading(true);
 		try {
 			const generatedQuestions = await generateQuestions(formData.topic, formData.difficulty);
 			setQuizData({
@@ -32,7 +34,9 @@ function App() {
 			setCurrentPage('quiz');
 		} catch (error) {
 			console.error('Failed to generate questions:', error);
-			// Handle error appropriately
+			alert('Failed to generate questions. Please try again.'); // Replace with better UI feedback later
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -65,8 +69,16 @@ function App() {
 			{currentPage === 'quiz' && (
 				<QuizInterface
 					onComplete={handleQuizComplete}
-					topic={quizData.topic}
-					difficulty={quizData.difficulty}
+					question={quizData.questions[quizData.currentQuestion]}
+					currentQuestion={quizData.currentQuestion}
+					totalQuestions={quizData.questions.length}
+					onAnswerSubmit={(isCorrect) => {
+						setQuizData(prev => ({
+							...prev,
+							score: isCorrect ? prev.score + 1 : prev.score,
+							currentQuestion: prev.currentQuestion + 1
+						}))
+					}}
 				/>
 			)}
 			{currentPage === 'results' && (
