@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 const QuizSetup = ({ onSubmit }) => {
 	const [formData, setFormData] = useState({
 		topic: '',
-		difficulty: 'intermediate'
+		difficulty: 'intermediate',
+		instantFeedback: false
 	});
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -71,6 +72,20 @@ const QuizSetup = ({ onSubmit }) => {
 									<option value="intermediate">Intermediate</option>
 									<option value="advanced">Advanced</option>
 								</select>
+							</div>
+
+							{/* Instant Feedback Toggle */}
+							<div className="flex items-center space-x-3 mt-4">
+								<input
+									type="checkbox"
+									id="instantFeedback"
+									checked={formData.instantFeedback}
+									onChange={(e) => setFormData({ ...formData, instantFeedback: e.target.checked })}
+									className="w-4 h-4 text-blue-600 rounded border-blue-300 focus:ring-blue-500"
+								/>
+								<label htmlFor="instantFeedback" className="text-blue-900">
+									Show instant feedback (Recommended for beginners)
+								</label>
 							</div>
 
 							{/* Submit Button */}

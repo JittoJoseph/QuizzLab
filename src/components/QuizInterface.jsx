@@ -10,6 +10,7 @@ const QuizInterface = ({
 	onComplete
 }) => {
 	const [selectedAnswer, setSelectedAnswer] = useState(null);
+	const [answered, setAnswered] = useState(false);
 
 	const handleNext = () => {
 		if (selectedAnswer === null) return;
@@ -17,10 +18,33 @@ const QuizInterface = ({
 		const isCorrect = selectedAnswer === question.correct;
 		onAnswerSubmit(isCorrect);
 		setSelectedAnswer(null);
+		setAnswered(false);
 
 		if (currentQuestion + 1 === totalQuestions) {
 			onComplete();
 		}
+	};
+
+	const handleAnswerSelect = (index) => {
+		setSelectedAnswer(index);
+		setAnswered(true);
+	};
+
+	const getOptionClass = (index) => {
+		if (!answered) return selectedAnswer === index ? 'bg-blue-100 border-2 border-blue-600' : 'hover:bg-blue-50 border-2 border-transparent';
+		if (index === question.correct) return 'bg-green-100 border-2 border-green-600';
+		if (selectedAnswer === index) return 'bg-red-100 border-2 border-red-600';
+		return 'opacity-50 border-2 border-transparent';
+	};
+
+	const getAnswerIcon = (index) => {
+		if (index === question.correct) {
+			return <CheckCircle className="w-5 h-5 text-green-600" />;
+		}
+		if (selectedAnswer === index) {
+			return <XCircle className="w-5 h-5 text-red-600" />;
+		}
+		return null;
 	};
 
 	if (!question) return null;
@@ -62,19 +86,18 @@ const QuizInterface = ({
 							{question.options.map((option, index) => (
 								<button
 									key={index}
-									onClick={() => setSelectedAnswer(index)}
+									onClick={() => handleAnswerSelect(index)}
+									disabled={answered}
 									className={`w-full p-4 text-left rounded-xl transition-all bg-transparent
-                    ${selectedAnswer === index
-											? 'bg-blue-100 border-2 border-blue-600'
-											: 'hover:bg-blue-50 border-2 border-transparent'
-										}
-                    text-blue-900 font-medium`}
+										${getOptionClass(index)}
+										text-blue-900 font-medium`}
 								>
 									<div className="flex items-center space-x-3">
 										<span className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-600 font-semibold">
 											{String.fromCharCode(65 + index)}
 										</span>
 										<span>{option}</span>
+										{answered && getAnswerIcon(index)}
 									</div>
 								</button>
 							))}
@@ -85,7 +108,7 @@ const QuizInterface = ({
 								onClick={handleNext}
 								disabled={selectedAnswer === null}
 								className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                  transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								{currentQuestion + 1 === totalQuestions ? 'Finish' : 'Next'}
 							</button>
