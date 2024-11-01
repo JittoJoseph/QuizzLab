@@ -2,8 +2,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Results = ({ score, totalQuestions, topic, onRetry, onNewQuiz }) => {
-	const percentage = (score / totalQuestions) * 100;
+const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onRetry, onNewQuiz }) => {
+	// Ensure percentage calculation is valid
+	const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
@@ -57,11 +58,15 @@ const Results = ({ score, totalQuestions, topic, onRetry, onNewQuiz }) => {
 						<div className="grid grid-cols-2 gap-4 mb-8">
 							<div className="bg-blue-50 rounded-xl p-4">
 								<div className="text-blue-800">Correct Answers</div>
-								<div className="text-2xl font-bold text-blue-900">{score}/{totalQuestions}</div>
+								<div className="text-2xl font-bold text-blue-900">
+									{score} / {totalQuestions}
+								</div>
 							</div>
 							<div className="bg-blue-50 rounded-xl p-4">
 								<div className="text-blue-800">Topic</div>
-								<div className="text-2xl font-bold text-blue-900">{topic}</div>
+								<div className="text-2xl font-bold text-blue-900 truncate">
+									{topic}
+								</div>
 							</div>
 						</div>
 

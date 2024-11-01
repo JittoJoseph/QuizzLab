@@ -40,13 +40,11 @@ function App() {
 		}
 	};
 
-	const handleQuizComplete = (finalScore) => {
-		setQuizData({
-			...quizData,
-			score: finalScore
-		})
-		setCurrentPage('results')
-	}
+	const handleQuizComplete = () => {
+		setCurrentPage('results');
+		// No need to update score here as it's already being tracked
+		// during quiz progression
+	};
 
 	const handleRetry = () => {
 		setQuizData({
@@ -83,9 +81,9 @@ function App() {
 			)}
 			{currentPage === 'results' && (
 				<Results
-					score={quizData.score}
-					totalQuestions={10}
-					topic={quizData.topic}
+					score={quizData.score || 0}  // Provide default value
+					totalQuestions={quizData.questions.length || 10}  // Use actual length
+					topic={quizData.topic || 'Quiz'}  // Provide default value
 					onRetry={handleRetry}
 					onNewQuiz={handleNewQuiz}
 				/>
