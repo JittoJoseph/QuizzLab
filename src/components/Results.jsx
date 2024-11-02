@@ -15,10 +15,41 @@ const Results = ({
 	pendingResult,
 	setPendingResult
 }) => {
-	console.log('Auth:', useAuth()); // Debug auth context
 	const [saving, setSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
 	const [saved, setSaved] = useState(false);
+	const { user, login } = useAuth();
+
+	// Use useEffect to handle saving only once when component mounts
+	useEffect(() => {
+		const saveResult = async () => {
+			// If already saved or no pending result, don't save
+			if (saved || !pendingResult || !user) return;
+
+			try {
+				setSaving(true);
+				await saveQuizResult({
+					userId: user.uid,
+					topic: pendingResult.topic,
+					score: pendingResult.score,
+					totalQuestions: pendingResult.totalQuestions,
+					difficulty: pendingResult.difficulty,
+					timestamp: Date.now()
+				});
+				setSaved(true);
+				// Clear pending result after successful save
+				setPendingResult(null);
+			} catch (error) {
+				setSaveError(error.message);
+			} finally {
+				setSaving(false);
+			}
+		};
+
+		if (user && pendingResult) {
+			saveResult();
+		}
+	}, [user, pendingResult]);
 
 	const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 	const isExcellentScore = percentage >= 90;
@@ -26,44 +57,6 @@ const Results = ({
 	const googleColors = [
 		'#4285F4', '#DB4437', '#F4B400', '#0F9D58',
 	];
-
-	const { user, login } = useAuth();
-
-	// Add useEffect for auto-save
-	useEffect(() => {
-		const autoSaveResult = async () => {
-			if (!user) return;
-
-			try {
-				await saveQuizResult(user.uid, {
-					topic,
-					score,
-					totalQuestions,
-					difficulty
-				});
-			} catch (error) {
-				console.error('Failed to save result:', error);
-			}
-		};
-
-		autoSaveResult();
-	}, []); // Run once when component mounts
-
-	useEffect(() => {
-		const saveAfterLogin = async () => {
-			if (user && pendingResult && !saved) {
-				try {
-					await saveQuizResult(user.uid, pendingResult);
-					setSaved(true);
-					setPendingResult(null);
-				} catch (error) {
-					setSaveError('Failed to save result');
-					console.error('Save error:', error);
-				}
-			}
-		};
-		saveAfterLogin();
-	}, [user, pendingResult]);
 
 	const handleSignIn = async () => {
 		try {
