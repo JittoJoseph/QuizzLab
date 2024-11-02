@@ -7,13 +7,17 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onNewQuiz, on
 	const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 	const isExcellentScore = percentage >= 90;
 
-	// Google brand colors
+	// Google brand colors for confetti
 	const googleColors = [
 		'#4285F4', // Google Blue
 		'#DB4437', // Google Red
 		'#F4B400', // Google Yellow
 		'#0F9D58', // Google Green
 	];
+
+	const handleNewQuiz = () => {
+		onNewQuiz(); // This will trigger resetQuizData and navigation
+	};
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
@@ -99,7 +103,7 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onNewQuiz, on
 								Back to Home
 							</button>
 							<button
-								onClick={onNewQuiz}
+								onClick={handleNewQuiz}
 								className="px-6 py-3 border-2 border-blue-600 text-blue-700 bg-transparent rounded-lg hover:bg-blue-50 transition-colors"
 							>
 								New Quiz

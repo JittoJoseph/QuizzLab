@@ -19,6 +19,17 @@ function App() {
 	})
 	const [isLoading, setIsLoading] = useState(false)
 
+	const resetQuizData = () => {
+		setQuizData({
+			topic: '',
+			difficulty: '',
+			questions: [],
+			currentQuestion: 0,
+			score: 0,
+			answers: []
+		});
+	};
+
 	const navigateToQuiz = () => {
 		setCurrentPage('quiz-setup')
 	}
@@ -31,7 +42,10 @@ function App() {
 				...quizData,
 				topic: formData.topic,
 				difficulty: formData.difficulty,
-				questions: generatedQuestions.questions
+				questions: generatedQuestions.questions,
+				currentQuestion: 0,
+				score: 0,
+				answers: []
 			});
 			setCurrentPage('quiz');
 		} catch (error) {
@@ -59,7 +73,8 @@ function App() {
 	}
 
 	const handleNewQuiz = () => {
-		setCurrentPage('quiz-setup')
+		resetQuizData(); // Reset data before navigating
+		setCurrentPage('quiz-setup');
 	}
 
 	return (
@@ -82,7 +97,10 @@ function App() {
 			/>
 			{currentPage === 'welcome' && (
 				<Welcome
-					onStartClick={navigateToQuiz}
+					onStartClick={() => {
+						resetQuizData();
+						setCurrentPage('quiz-setup');
+					}}
 					onNavigate={setCurrentPage}
 				/>
 			)}
