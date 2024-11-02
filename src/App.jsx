@@ -60,12 +60,21 @@ function App() {
 	};
 
 	const handleQuizComplete = () => {
-		setPendingResult({
+		// Only set pendingResult once when quiz completes
+		if (!quizData?.topic) {
+			console.error('Quiz data incomplete:', quizData);
+			return;
+		}
+
+		const result = {
 			topic: quizData.topic,
 			score: quizData.score,
 			totalQuestions: quizData.questions.length,
-			difficulty: quizData.difficulty
-		});
+			difficulty: quizData.difficulty || 'beginner',
+			timestamp: Date.now()
+		};
+
+		setPendingResult(result);
 		setCurrentPage('results');
 	};
 
@@ -99,8 +108,8 @@ function App() {
 					<Results
 						score={quizData.score}
 						totalQuestions={quizData.questions.length}
-						topic={quizData.topic}
-						difficulty={quizData.difficulty}
+						topic={quizData.topic || ''}
+						difficulty={quizData.difficulty || 'beginner'}
 						onNewQuiz={navigateToQuiz}
 						onNavigate={setCurrentPage}
 						pendingResult={pendingResult}

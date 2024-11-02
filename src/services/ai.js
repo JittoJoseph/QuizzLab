@@ -21,18 +21,41 @@ export async function generateQuestions(topic, difficulty) {
 		}
 
 		let text = result.response.text();
-		// Basic cleanup
-		text = text.replace(/[\u201C\u201D\u2018\u2019]/g, '"')
-			.replace(/```[^`]*```/g, '')
-			.replace(/\n/g, '')
+
+		// Enhanced cleanup
+		text = text
+			.replace(/[\u201C\u201D\u2018\u2019]/g, '"') // Fix smart quotes
+			.replace(/```json\s*|\s*```/g, '') // Remove code blocks
+			.replace(/\n/g, '') // Remove newlines
+			.replace(/,\s*([}\]])/g, '$1') // Remove trailing commas
+			.replace(/([{,]\s*)(\w+)(:)/g, '$1"$2"$3') // Ensure property names are quoted
 			.trim();
 
-		const parsed = JSON.parse(text);
-		if (!parsed.questions || !Array.isArray(parsed.questions)) {
-			throw new Error('Invalid response structure');
+		// Validate JSON structure before parsing
+		if (!text.startsWith('{') || !text.endsWith('}')) {
+			throw new Error('Invalid JSON structure in AI response');
 		}
 
-		return parsed;
+		try {
+			const parsed = JSON.parse(text);
+
+			// Validate expected structure
+			if (!parsed.questions || !Array.isArray(parsed.questions)) {
+				throw new Error('Invalid response structure: missing questions array');
+			}
+
+			// Validate each question
+			parsed.questions.forEach((q, i) => {
+				if (!q.question || !Array.isArray(q.options) || q.correct === undefined) {
+					throw new Error(`Invalid question structure at index ${i}`);
+				}
+			});
+
+			return parsed;
+		} catch (parseError) {
+			console.error('Raw response:', text);
+			throw new Error(`JSON parsing failed: ${parseError.message}`);
+		}
 	} catch (error) {
 		console.error('Generation error:', error.message);
 		throw error;

@@ -1,15 +1,15 @@
 // src/components/Results.jsx
-import React, { useContext, useState, useEffect } from 'react'; // Add useEffect
+import React, { useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Confetti from 'react-confetti';
 import { useAuth } from '../context/AuthContext';
 import { saveQuizResult } from '../services/firebase';
 
 const Results = ({
-	score = 0,
-	totalQuestions = 10,
-	topic = 'Quiz',
-	difficulty = 'intermediate',
+	score,
+	totalQuestions,
+	topic,
+	difficulty,
 	onNewQuiz,
 	onNavigate,
 	pendingResult,
@@ -20,52 +20,46 @@ const Results = ({
 	const [saved, setSaved] = useState(false);
 	const { user, login } = useAuth();
 
-	// Use useEffect to handle saving only once when component mounts
-	useEffect(() => {
-		const saveResult = async () => {
-			// If already saved or no pending result, don't save
-			if (saved || !pendingResult || !user) return;
-
-			try {
-				setSaving(true);
-				await saveQuizResult({
-					userId: user.uid,
-					topic: pendingResult.topic,
-					score: pendingResult.score,
-					totalQuestions: pendingResult.totalQuestions,
-					difficulty: pendingResult.difficulty,
-					timestamp: Date.now()
-				});
-				setSaved(true);
-				// Clear pending result after successful save
-				setPendingResult(null);
-			} catch (error) {
-				setSaveError(error.message);
-			} finally {
-				setSaving(false);
-			}
-		};
-
-		if (user && pendingResult) {
-			saveResult();
-		}
-	}, [user, pendingResult]);
-
 	const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 	const isExcellentScore = percentage >= 90;
 
-	const googleColors = [
-		'#4285F4', '#DB4437', '#F4B400', '#0F9D58',
-	];
+	const googleColors = ['#4285F4', '#DB4437', '#F4B400', '#0F9D58'];
+
+	// Single save function
+	const saveResult = async () => {
+		if (saving || !user) return;
+
+		try {
+			setSaving(true);
+			await saveQuizResult(user.uid, {
+				topic,
+				score,
+				totalQuestions,
+				difficulty,
+				timestamp: Date.now()
+			});
+			setSaved(true);
+		} catch (error) {
+			console.error('Save error:', error);
+			setSaveError(error.message);
+		} finally {
+			setSaving(false);
+		}
+	};
 
 	const handleSignIn = async () => {
 		try {
 			await login();
-			// Result will be auto-saved by useEffect
+			// Only save if not already saved
+			if (!saved) {
+				await saveResult();
+			}
 		} catch (error) {
 			console.error('Login error:', error);
 		}
 	};
+
+	// Remove useEffect auto-save completely
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
@@ -166,7 +160,7 @@ const Results = ({
 
 						{/* Auth/Save Section */}
 						<div className="mt-6 space-y-4">
-							{!user && (
+							{!user ? (
 								<div className="p-4 bg-blue-50 rounded-lg text-center">
 									<p className="text-blue-800 mb-2">Sign in to save your progress</p>
 									<button
@@ -176,16 +170,24 @@ const Results = ({
 										Sign in with Google
 									</button>
 								</div>
-							)}
-
-							{saved && (
-								<div className="text-green-600 font-medium">
+							) : !saved ? (
+								<div className="text-center">
+									<button
+										onClick={saveResult}
+										disabled={saving}
+										className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+									>
+										{saving ? 'Saving...' : 'Save Result'}
+									</button>
+								</div>
+							) : (
+								<div className="text-green-600 font-medium text-center">
 									Result saved successfully!
 								</div>
 							)}
 
 							{saveError && (
-								<div className="text-red-600 font-medium">
+								<div className="text-red-600 font-medium text-center">
 									{saveError}
 								</div>
 							)}
