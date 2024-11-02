@@ -64,11 +64,11 @@ const QuizSetup = ({ onSubmit }) => {
 									id="topic"
 									value={formData.topic}
 									onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-									placeholder="Enter any topic (e.g., Photosynthesis)"
+									required
 									className="w-full px-4 py-3 rounded-lg border border-blue-200 
 										focus:outline-none focus:ring-2 focus:ring-blue-500 
-										bg-transparent text-blue-900 placeholder-blue-400"
-									required
+										bg-transparent text-blue-900"
+									placeholder="Enter any topic (e.g., 'Photosynthesis')"
 								/>
 							</div>
 

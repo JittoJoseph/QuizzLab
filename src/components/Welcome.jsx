@@ -178,16 +178,18 @@ const Welcome = ({ onStartClick, onNavigate }) => {
 			</div>
 
 			{/* Footer */}
-			<footer className="bg-blue-800 text-white py-6">
-				<div className="container mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-					<p className="text-center w-full md:w-auto">
-						<a href="https://www.linkedin.com/in/jittojoseph17/" className="text-white hover:text-blue-200">© 2024 Jitto Joseph</a>
+			<footer className="bg-blue-800 text-white py-4 mt-8 sm:mt-0">
+				<div className="container mx-auto px-4 text-center">
+					<p>
+						<a
+							href="https://www.linkedin.com/in/jittojoseph17/"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-white hover:text-blue-200 transition-colors font-medium"
+						>
+							© 2024 Jitto Joseph
+						</a>
 					</p>
-					<div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto text-center">
-						<a href="#" className="text-white hover:text-blue-200 block md:inline">Privacy</a>
-						<a href="#" className="text-white hover:text-blue-200 block md:inline">Terms</a>
-						<a href="#" className="text-white hover:text-blue-200 block md:inline">Contact</a>
-					</div>
 				</div>
 			</footer>
 		</div>

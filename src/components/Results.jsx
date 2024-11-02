@@ -1,5 +1,5 @@
 // src/components/Results.jsx
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react'; // Add useEffect
 import PropTypes from 'prop-types';
 import Confetti from 'react-confetti';
 import { useAuth } from '../context/AuthContext';
@@ -20,26 +20,25 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', difficulty = 
 
 	const { user, login } = useAuth();
 
-	const handleSave = async () => {
-		if (!user) return;
-		setSaving(true);
-		setSaveError(null);
+	// Add useEffect for auto-save
+	useEffect(() => {
+		const autoSaveResult = async () => {
+			if (!user) return;
 
-		try {
-			await saveQuizResult(user.uid, {
-				topic,
-				score,
-				totalQuestions,
-				difficulty
-			});
-			setSaved(true);
-		} catch (error) {
-			setSaveError('Failed to save result');
-			console.error('Save error:', error);
-		} finally {
-			setSaving(false);
-		}
-	};
+			try {
+				await saveQuizResult(user.uid, {
+					topic,
+					score,
+					totalQuestions,
+					difficulty
+				});
+			} catch (error) {
+				console.error('Failed to save result:', error);
+			}
+		};
+
+		autoSaveResult();
+	}, []); // Run once when component mounts
 
 	const handleSignIn = async () => {
 		try {
@@ -158,17 +157,6 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', difficulty = 
 										Sign in with Google
 									</button>
 								</div>
-							)}
-
-							{user && !saved && (
-								<button
-									onClick={handleSave}
-									disabled={saving}
-									className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                    transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-								>
-									{saving ? 'Saving...' : 'Save Result'}
-								</button>
 							)}
 
 							{saved && (
