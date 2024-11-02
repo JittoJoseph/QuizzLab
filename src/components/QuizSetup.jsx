@@ -35,7 +35,7 @@ const QuizSetup = ({ onSubmit }) => {
 					<div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
 						<span className="text-white font-bold text-xl">Q</span>
 					</div>
-					<h1 className="text-2xl font-bold text-blue-800">QuizzyAI</h1>
+					<h1 className="text-2xl font-bold text-blue-800">QuizzLab</h1>
 				</div>
 			</div>
 

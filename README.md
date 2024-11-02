@@ -1,4 +1,4 @@
-# QuizzyAI 🎯
+# QuizzLab 🎯
 
 An AI-powered quiz generation platform that creates personalized learning experiences using Google's Gemini AI.
 
@@ -29,8 +29,8 @@ An AI-powered quiz generation platform that creates personalized learning experi
 
 1. Clone the repository
 ```bash
-git clone https://github.com/JittoJoseph/QuizzyAI.git
-cd quizzyai
+git clone https://github.com/JittoJoseph/QuizzLab.git
+cd QuizzLab
 ```
 
 2. Install dependencies
