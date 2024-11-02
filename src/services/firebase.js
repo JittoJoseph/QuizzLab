@@ -5,33 +5,66 @@ import {
 	addDoc,
 	query,
 	where,
-	getDocs
+	getDocs,
+	orderBy
 } from 'firebase/firestore';
 import {
 	GoogleAuthProvider,
-	signInWithPopup
+	signInWithPopup,
+	signOut
 } from 'firebase/auth';
 
 // Auth
-export const signInWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
+export const signInWithGoogle = async () => {
+	try {
+		return await signInWithPopup(auth, new GoogleAuthProvider());
+	} catch (error) {
+		console.error('Auth error:', error);
+		throw error;
+	}
+};
+
+export const logOut = async () => {
+	try {
+		await signOut(auth);
+	} catch (error) {
+		console.error('Logout error:', error);
+		throw error;
+	}
+};
 
 // Quiz Data
 export const saveQuizResult = async (userId, quizData) => {
-	return addDoc(collection(db, 'quizResults'), {
-		userId,
-		topic: quizData.topic,
-		score: quizData.score,
-		totalQuestions: quizData.totalQuestions,
-		difficulty: quizData.difficulty,
-		timestamp: new Date()
-	});
+	try {
+		return await addDoc(collection(db, 'quizResults'), {
+			userId,
+			topic: quizData.topic,
+			score: quizData.score,
+			totalQuestions: quizData.totalQuestions,
+			difficulty: quizData.difficulty,
+			timestamp: new Date()
+		});
+	} catch (error) {
+		console.error('Save error:', error);
+		throw error;
+	}
 };
 
 export const getUserHistory = async (userId) => {
-	const q = query(
-		collection(db, 'quizResults'),
-		where('userId', '==', userId)
-	);
-	const snapshot = await getDocs(q);
-	return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+	try {
+		const q = query(
+			collection(db, 'quizResults'),
+			where('userId', '==', userId),
+			orderBy('timestamp', 'desc')
+		);
+		const snapshot = await getDocs(q);
+		return snapshot.docs.map(doc => ({
+			id: doc.id,
+			...doc.data(),
+			timestamp: doc.data().timestamp.toDate()
+		}));
+	} catch (error) {
+		console.error('Get history error:', error);
+		throw error;
+	}
 };

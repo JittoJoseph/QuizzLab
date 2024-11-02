@@ -1,60 +1,100 @@
-import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { UserCircle } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { useAuth } from '../context/AuthContext';
 
 const Welcome = ({ onStartClick, onNavigate }) => {
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const { user, login, logout } = useAuth();
+	const [showDropdown, setShowDropdown] = useState(false);
+	const dropdownRef = useRef(null);
 
-	const toggleMenu = () => {
-		setIsMenuOpen(!isMenuOpen);
+	useEffect(() => {
+		const handleClickOutside = (event) => {
+			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+				setShowDropdown(false);
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
+
+	const handleAuth = async () => {
+		if (!user) {
+			try {
+				await login();
+			} catch (error) {
+				console.error('Auth error:', error);
+			}
+		}
 	};
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
-			{/* Responsive Navigation */}
-			<nav className="px-4 md:px-8 py-4 flex justify-between items-center relative">
-				<div className="flex items-center space-x-2">
-					<div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-						<span className="text-white font-bold text-xl">Q</span>
+			{/* Navbar */}
+			<nav className="px-4 md:px-8 py-4 bg-white/50 backdrop-blur-sm">
+				<div className="container mx-auto flex justify-between items-center">
+					<div className="flex items-center space-x-2">
+						<div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+							<span className="text-white font-bold text-xl">Q</span>
+						</div>
+						<h1 className="text-2xl font-bold text-blue-800">QuizzyAI</h1>
 					</div>
-					<h1 className="text-2xl font-bold text-blue-800">QuizzyAI</h1>
-				</div>
 
-				{/* Mobile Menu Toggle */}
-				<div className="md:hidden">
-					<button
-						onClick={toggleMenu}
-						className="text-blue-700 focus:outline-none bg-transparent"
-					>
-						{isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-					</button>
-				</div>
+					<div className="relative" ref={dropdownRef}>
+						<button
+							onClick={user ? () => setShowDropdown(!showDropdown) : handleAuth}
+							className="px-4 py-2 bg-transparent border-2 border-blue-600 rounded-lg 
+                hover:bg-blue-50 transition-colors flex items-center space-x-2 
+                text-blue-700 font-medium"
+						>
+							{user ? (
+								<>
+									<img
+										src={user.photoURL}
+										alt={user.displayName}
+										className="w-6 h-6 rounded-full"
+									/>
+									<span>Account</span>
+								</>
+							) : (
+								<>
+									<UserCircle className="w-5 h-5" />
+									<span>Sign In</span>
+								</>
+							)}
+						</button>
 
-				{/* Navigation Links */}
-				<div className={`
-          ${isMenuOpen ? 'flex' : 'hidden'} 
-          md:flex 
-          flex-col md:flex-row 
-          absolute md:static 
-          top-full left-0 right-0 
-          bg-white md:bg-transparent 
-          shadow-lg md:shadow-none 
-          z-20 
-          space-y-2 md:space-y-0 md:space-x-4 
-          p-4 md:p-0
-        `}>
-					<button
-						onClick={() => window.open('https://github.com/JittoJoseph/QuizzyAI', '_blank')}
-						className="text-blue-700 hover:text-blue-900 font-semibold bg-transparent block w-full md:w-auto text-left"
-					>
-						About
-					</button>
-					<button
-						onClick={() => onNavigate('features')}
-						className="text-blue-700 hover:text-blue-900 font-semibold bg-transparent block w-full md:w-auto text-left"
-					>
-						Features
-					</button>
+						{/* Improved Dropdown */}
+						{user && showDropdown && (
+							<div className="absolute right-0 mt-2 w-48 bg-gradient-to-br from-white to-blue-50 
+    backdrop-blur-sm rounded-lg shadow-lg border border-blue-100 overflow-hidden z-50"
+							>
+								<button
+									onClick={() => {
+										setShowDropdown(false);
+										onNavigate('profile');
+									}}
+									className="w-full px-4 py-3 text-left bg-transparent hover:bg-blue-100/50 
+        text-blue-700 font-medium transition-all flex items-center space-x-2"
+								>
+									<UserCircle className="w-5 h-5" />
+									<span>My Profile</span>
+								</button>
+								<div className="h-[1px] bg-blue-100"></div>
+								<button
+									onClick={() => {
+										setShowDropdown(false);
+										logout();
+									}}
+									className="w-full px-4 py-3 text-left bg-transparent hover:bg-red-100/50
+        text-red-600 font-medium transition-all"
+								>
+									<span>Sign Out</span>
+								</button>
+							</div>
+						)}
+					</div>
 				</div>
 			</nav>
 

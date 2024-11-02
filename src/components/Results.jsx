@@ -1,35 +1,52 @@
 // src/components/Results.jsx
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import Confetti from 'react-confetti';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { saveQuizResult } from '../services/firebase';
 
-const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onNewQuiz, onNavigate }) => {
+const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', difficulty = 'intermediate', onNewQuiz, onNavigate }) => {
+	console.log('Auth:', useAuth()); // Debug auth context
+	const [saving, setSaving] = useState(false);
+	const [saveError, setSaveError] = useState(null);
+	const [saved, setSaved] = useState(false);
+
 	const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 	const isExcellentScore = percentage >= 90;
 
-	// Google brand colors for confetti
 	const googleColors = [
-		'#4285F4', // Google Blue
-		'#DB4437', // Google Red
-		'#F4B400', // Google Yellow
-		'#0F9D58', // Google Green
+		'#4285F4', '#DB4437', '#F4B400', '#0F9D58',
 	];
 
-	const handleNewQuiz = () => {
-		onNewQuiz(); // This will trigger resetQuizData and navigation
-	};
-
-	const { user } = useContext(AuthContext);
+	const { user, login } = useAuth();
 
 	const handleSave = async () => {
 		if (!user) return;
-		await saveQuizResult(user.uid, {
-			topic,
-			score,
-			totalQuestions
-		});
+		setSaving(true);
+		setSaveError(null);
+
+		try {
+			await saveQuizResult(user.uid, {
+				topic,
+				score,
+				totalQuestions,
+				difficulty
+			});
+			setSaved(true);
+		} catch (error) {
+			setSaveError('Failed to save result');
+			console.error('Save error:', error);
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	const handleSignIn = async () => {
+		try {
+			await login();
+		} catch (error) {
+			console.error('Login error:', error);
+		}
 	};
 
 	return (
@@ -116,23 +133,50 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onNewQuiz, on
 								Back to Home
 							</button>
 							<button
-								onClick={handleNewQuiz}
+								onClick={onNewQuiz}
 								className="px-6 py-3 border-2 border-blue-600 text-blue-700 bg-transparent rounded-lg hover:bg-blue-50 transition-colors"
 							>
 								New Quiz
 							</button>
 						</div>
-						{user && (
-							<button onClick={handleSave} className="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-								Save Result
-							</button>
-						)}
-						{!user && (
-							<div className="mt-4">
-								<p>Sign in to save your progress</p>
-								<LoginButton />
-							</div>
-						)}
+
+						{/* Auth/Save Section */}
+						<div className="mt-6 space-y-4">
+							{!user && (
+								<div className="p-4 bg-blue-50 rounded-lg text-center">
+									<p className="text-blue-800 mb-2">Sign in to save your progress</p>
+									<button
+										onClick={handleSignIn}
+										className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+									>
+										Sign in with Google
+									</button>
+								</div>
+							)}
+
+							{user && !saved && (
+								<button
+									onClick={handleSave}
+									disabled={saving}
+									className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                    transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									{saving ? 'Saving...' : 'Save Result'}
+								</button>
+							)}
+
+							{saved && (
+								<div className="text-green-600 font-medium">
+									Result saved successfully!
+								</div>
+							)}
+
+							{saveError && (
+								<div className="text-red-600 font-medium">
+									{saveError}
+								</div>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -144,6 +188,7 @@ Results.propTypes = {
 	score: PropTypes.number.isRequired,
 	totalQuestions: PropTypes.number.isRequired,
 	topic: PropTypes.string.isRequired,
+	difficulty: PropTypes.string,
 	onNewQuiz: PropTypes.func.isRequired,
 	onNavigate: PropTypes.func.isRequired
 };
