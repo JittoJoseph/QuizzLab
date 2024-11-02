@@ -2,7 +2,7 @@
 
 An AI-powered quiz generation platform that creates personalized learning experiences using Google's Gemini AI.
 
-## Features ✨
+## Features 
 
 - **AI-Powered Quiz Generation**: Create custom quizzes on any topic instantly
 - **Multiple Difficulty Levels**: Choose between Beginner, Intermediate, and Advanced
@@ -11,16 +11,14 @@ An AI-powered quiz generation platform that creates personalized learning experi
 - **User Profiles**: Save quiz history and view performance analytics
 - **Responsive Design**: Seamless experience across all devices
 
-## Tech Stack 🛠️
+## Tech Stack 
 
 - React 18 + Vite
 - Firebase (Auth + Firestore)
 - Google Gemini AI
 - TailwindCSS
-- React Hot Toast
-- React Confetti
 
-## Setup 🚀
+## Setup 
 
 ### Prerequisites
 - Node.js 16+ installed
@@ -31,7 +29,7 @@ An AI-powered quiz generation platform that creates personalized learning experi
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/quizzyai.git
+git clone https://github.com/JittoJoseph/QuizzyAI.git
 cd quizzyai
 ```
 
@@ -89,7 +87,7 @@ VITE_GEMINI_API_KEY=your_gemini_api_key
 npm run dev
 ```
 
-## Deployment 📦
+## Deployment 
 
 1. Push code to GitHub repository
 
