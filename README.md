@@ -1,12 +1,3 @@
-# Plan
-1. Create comprehensive 
-
-README.md
-
-
-2. Include project description, features, tech stack, setup instructions, and deployment steps
-
-```markdown
 # QuizzyAI 🎯
 
 An AI-powered quiz generation platform that creates personalized learning experiences using Google's Gemini AI.
@@ -31,9 +22,16 @@ An AI-powered quiz generation platform that creates personalized learning experi
 
 ## Setup 🚀
 
+### Prerequisites
+- Node.js 16+ installed
+- A Google Cloud account for Gemini API
+- A Firebase account
+
+### Installation Steps
+
 1. Clone the repository
 ```bash
-git clone https://github.com/JittoJoseph/quizzyai.git
+git clone https://github.com/yourusername/quizzyai.git
 cd quizzyai
 ```
 
@@ -42,29 +40,69 @@ cd quizzyai
 npm install
 ```
 
-3. Create 
+3. Firebase Setup
+- Go to [Firebase Console](https://console.firebase.google.com)
+- Create a new project
+- Enable Authentication:
+  - Go to Authentication > Sign-in method
+  - Enable Google Sign-in
+- Create Firestore Database:
+  - Go to Firestore Database
+  - Create database in test mode
+- Get Firebase Config:
+  - Go to Project Settings > General
+  - Scroll to "Your apps"
+  - Click Web icon (</>)
+  - Register app and copy config
+
+4. Update Firebase Configuration
+Replace the config in 
+
+firebase.js
+
+:
+```javascript
+const firebaseConfig = {
+  apiKey: "your-api-key",
+  authDomain: "your-app.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-app.appspot.com",
+  messagingSenderId: "your-sender-id",
+  appId: "your-app-id",
+  measurementId: "your-measurement-id"
+};
+```
+
+5. Environment Setup
+Create 
 
 .env
 
- file in root directory with:
+ file in root directory:
 ```plaintext
-VITE_FIREBASE_API_KEY=your_firebase_key
-VITE_GEMINI_API_KEY=your_gemini_key
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_GEMINI_API_KEY=your_gemini_api_key
 ```
 
-4. Start development server
+6. Start Development Server
 ```bash
 npm run dev
 ```
 
 ## Deployment 📦
 
-This project is configured for deployment on Vercel:
+1. Push code to GitHub repository
 
-1. Push code to GitHub
-2. Connect repository to Vercel
-3. Add environment variables
-4. Deploy!
+2. Deploy on Vercel:
+- Go to [vercel.com](https://vercel.com)
+- Sign in with GitHub
+- Import your repository
+- Configure build settings:
+  - Framework Preset: Vite
+  - Build Command: npm run build
+  - Output Directory: dist
+- Add environment variables
+- Deploy!
 
 
 ## License
