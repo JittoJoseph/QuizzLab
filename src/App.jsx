@@ -20,6 +20,7 @@ function App() {
 		answers: []
 	});
 	const [isLoading, setIsLoading] = useState(false);
+	const [pendingResult, setPendingResult] = useState(null);
 
 	const resetQuizData = () => {
 		setQuizData({
@@ -59,6 +60,12 @@ function App() {
 	};
 
 	const handleQuizComplete = () => {
+		setPendingResult({
+			topic: quizData.topic,
+			score: quizData.score,
+			totalQuestions: quizData.questions.length,
+			difficulty: quizData.difficulty
+		});
 		setCurrentPage('results');
 	};
 
@@ -96,6 +103,8 @@ function App() {
 						difficulty={quizData.difficulty}
 						onNewQuiz={navigateToQuiz}
 						onNavigate={setCurrentPage}
+						pendingResult={pendingResult}
+						setPendingResult={setPendingResult}
 					/>
 				)}
 				{currentPage === 'profile' && (

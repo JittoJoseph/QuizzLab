@@ -5,7 +5,16 @@ import Confetti from 'react-confetti';
 import { useAuth } from '../context/AuthContext';
 import { saveQuizResult } from '../services/firebase';
 
-const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', difficulty = 'intermediate', onNewQuiz, onNavigate }) => {
+const Results = ({
+	score = 0,
+	totalQuestions = 10,
+	topic = 'Quiz',
+	difficulty = 'intermediate',
+	onNewQuiz,
+	onNavigate,
+	pendingResult,
+	setPendingResult
+}) => {
 	console.log('Auth:', useAuth()); // Debug auth context
 	const [saving, setSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
@@ -40,9 +49,26 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', difficulty = 
 		autoSaveResult();
 	}, []); // Run once when component mounts
 
+	useEffect(() => {
+		const saveAfterLogin = async () => {
+			if (user && pendingResult && !saved) {
+				try {
+					await saveQuizResult(user.uid, pendingResult);
+					setSaved(true);
+					setPendingResult(null);
+				} catch (error) {
+					setSaveError('Failed to save result');
+					console.error('Save error:', error);
+				}
+			}
+		};
+		saveAfterLogin();
+	}, [user, pendingResult]);
+
 	const handleSignIn = async () => {
 		try {
 			await login();
+			// Result will be auto-saved by useEffect
 		} catch (error) {
 			console.error('Login error:', error);
 		}
@@ -184,7 +210,9 @@ Results.propTypes = {
 	topic: PropTypes.string.isRequired,
 	difficulty: PropTypes.string,
 	onNewQuiz: PropTypes.func.isRequired,
-	onNavigate: PropTypes.func.isRequired
+	onNavigate: PropTypes.func.isRequired,
+	pendingResult: PropTypes.object,
+	setPendingResult: PropTypes.func
 };
 
 export default Results;
