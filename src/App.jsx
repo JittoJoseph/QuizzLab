@@ -5,7 +5,8 @@ import Welcome from './components/Welcome';
 import QuizSetup from './components/QuizSetup';
 import QuizInterface from './components/QuizInterface';
 import Results from './components/Results';
-import Profile from './components/Profile'; // Add this import
+import Profile from './components/Profile';
+import Features from './components/Features'; // Add this import
 import { generateQuestions } from './services/ai';
 
 function App() {
@@ -67,6 +68,9 @@ function App() {
 				<Toaster position="top-center" />
 				{currentPage === 'welcome' && (
 					<Welcome onStartClick={navigateToQuiz} onNavigate={setCurrentPage} />
+				)}
+				{currentPage === 'features' && (  // Add this block
+					<Features onNavigate={setCurrentPage} />
 				)}
 				{currentPage === 'quiz-setup' && <QuizSetup onSubmit={startQuiz} />}
 				{currentPage === 'quiz' && (

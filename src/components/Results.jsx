@@ -133,6 +133,12 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', difficulty = 
 								Back to Home
 							</button>
 							<button
+								onClick={() => onNavigate('profile')}
+								className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+							>
+								View Profile
+							</button>
+							<button
 								onClick={onNewQuiz}
 								className="px-6 py-3 border-2 border-blue-600 text-blue-700 bg-transparent rounded-lg hover:bg-blue-50 transition-colors"
 							>

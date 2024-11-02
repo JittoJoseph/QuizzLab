@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Features = ({ onBack }) => {
+const Features = ({ onNavigate }) => {
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
 			{/* Header */}
@@ -15,7 +15,7 @@ const Features = ({ onBack }) => {
 						<h1 className="text-2xl font-bold text-blue-800">QuizzyAI</h1>
 					</div>
 					<button
-						onClick={onBack}
+						onClick={() => onNavigate('welcome')}
 						className="text-blue-700 hover:text-blue-900 font-bold bg-transparent px-6 py-2 text-lg"
 					>
 						Back
@@ -66,7 +66,7 @@ FeatureCard.propTypes = {
 };
 
 Features.propTypes = {
-	onBack: PropTypes.func.isRequired
+	onNavigate: PropTypes.func.isRequired
 };
 
 export default Features;

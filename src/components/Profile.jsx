@@ -4,11 +4,13 @@ import PropTypes from 'prop-types';
 import { useAuth } from '../context/AuthContext';
 import { getUserHistory } from '../services/firebase';
 import { ArrowLeft } from 'lucide-react';
+import { Chart } from "react-google-charts";
 
 const Profile = ({ onNavigate }) => {
 	const { user } = useAuth();
 	const [history, setHistory] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [chartLoading, setChartLoading] = useState(true);
 
 	useEffect(() => {
 		const fetchHistory = async () => {
@@ -24,6 +26,14 @@ const Profile = ({ onNavigate }) => {
 
 		fetchHistory();
 	}, [user]);
+
+	const getChartData = (history) => {
+		const data = [['Quiz', 'Score']];
+		history.forEach(quiz => {
+			data.push([quiz.topic, quiz.score]);
+		});
+		return data;
+	};
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
@@ -96,6 +106,43 @@ const Profile = ({ onNavigate }) => {
 						</div>
 					)}
 				</div>
+
+				{history.length > 0 && (
+					<div className="mt-8">
+						<h3 className="text-xl font-bold text-blue-900 mb-4">Performance Overview</h3>
+						{chartLoading && (
+							<div className="flex justify-center py-8">
+								<div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+							</div>
+						)}
+						<div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg">
+							<Chart
+								chartType="LineChart"
+								data={getChartData(history)}
+								options={{
+									title: 'Quiz Performance',
+									curveType: 'function',
+									legend: { position: 'none' },
+									colors: ['#2563EB'],
+									backgroundColor: 'transparent',
+									vAxis: {
+										viewWindow: {
+											min: 0,
+											max: 10
+										},
+										ticks: [0, 5, 10], // Only show these values
+										gridlines: {
+											count: 3 // Matches number of ticks
+										}
+									}
+								}}
+								width="100%"
+								height="400px"
+								onLoad={() => setChartLoading(false)}
+							/>
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);
