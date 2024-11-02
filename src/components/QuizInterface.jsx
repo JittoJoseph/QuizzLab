@@ -12,11 +12,16 @@ const QuizInterface = ({
 }) => {
 	const [selectedAnswer, setSelectedAnswer] = useState(null);
 	const [answered, setAnswered] = useState(false);
+	const [showExplanation, setShowExplanation] = useState(false);
+	const [score, setScore] = useState(0); // Add score state
 
 	const handleNext = () => {
 		if (selectedAnswer === null) return;
 
 		const isCorrect = selectedAnswer === question.correct;
+		if (isCorrect) {
+			setScore(prev => prev + 1); // Update score
+		}
 		onAnswerSubmit(isCorrect);
 		setSelectedAnswer(null);
 		setAnswered(false);
@@ -64,6 +69,10 @@ const QuizInterface = ({
 								Question {currentQuestion + 1}/{totalQuestions}
 							</span>
 						</div>
+						<div className="flex items-center space-x-2">
+							<span className="text-blue-900 font-semibold">Score:</span>
+							<span className="text-blue-900 font-medium">{score}/{totalQuestions}</span>
+						</div>
 					</div>
 					{/* Progress Bar */}
 					<div className="w-full h-2 bg-blue-100 rounded-full mt-4">
@@ -103,6 +112,15 @@ const QuizInterface = ({
 								</button>
 							))}
 						</div>
+
+						{answered && (
+							<div className="mt-4 p-4 bg-blue-50 rounded-lg">
+								<div className="text-blue-900 font-medium">
+									{selectedAnswer === question.correct ?
+										'✨ Correct!' : '❌ Incorrect'}
+								</div>
+							</div>
+						)}
 
 						<div className="flex justify-end pt-6">
 							<button

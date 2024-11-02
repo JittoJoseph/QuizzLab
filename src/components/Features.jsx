@@ -1,30 +1,8 @@
 // src/components/Features.jsx
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const Features = ({ onBack }) => {
-	const features = [
-		{
-			title: "AI-Powered Questions",
-			description: "Generate unique questions on any topic using Google's Gemini AI",
-			icon: "✨"
-		},
-		{
-			title: "Instant Feedback",
-			description: "Get immediate feedback on your answers with detailed explanations",
-			icon: "⚡"
-		},
-		{
-			title: "Adaptive Difficulty",
-			description: "Choose between beginner, intermediate, and advanced levels",
-			icon: "📈"
-		},
-		{
-			title: "Progress Tracking",
-			description: "Monitor your performance with real-time scoring and progress indicators",
-			icon: "📊"
-		}
-	];
-
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
 			{/* Header */}
@@ -38,37 +16,57 @@ const Features = ({ onBack }) => {
 					</div>
 					<button
 						onClick={onBack}
-						className="text-blue-700 hover:text-blue-900 font-semibold bg-transparent"
+						className="text-blue-700 hover:text-blue-900 font-bold bg-transparent px-6 py-2 text-lg"
 					>
 						Back
 					</button>
 				</div>
 			</div>
 
-			{/* Features Grid */}
-			<div className="flex-grow container mx-auto px-4 md:px-8 py-8 md:py-16">
-				<h2 className="text-3xl md:text-4xl font-bold text-blue-900 text-center mb-12">
-					Powerful Features for Better Learning
-				</h2>
+			<div className="container mx-auto px-4 md:px-8 py-12">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-					{features.map((feature, index) => (
-						<div
-							key={index}
-							className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-shadow"
-						>
-							<div className="text-4xl mb-4">{feature.icon}</div>
-							<h3 className="text-xl font-bold text-blue-900 mb-2">
-								{feature.title}
-							</h3>
-							<p className="text-blue-800 opacity-80">
-								{feature.description}
-							</p>
-						</div>
-					))}
+					<FeatureCard
+						title="AI-Powered Generation"
+						description="Generate 10 unique multiple choice questions on any topic using Google's Gemini AI"
+						icon="🤖"
+					/>
+					<FeatureCard
+						title="Instant Feedback Mode"
+						description="Enable instant feedback to see correct/wrong answers immediately after selection"
+						icon="⚡"
+					/>
+					<FeatureCard
+						title="Difficulty Levels"
+						description="Customize your learning with Beginner, Intermediate, and Advanced modes"
+						icon="📊"
+					/>
+					<FeatureCard
+						title="Score Tracking"
+						description="Track your performance with a beautiful progress bar and final score summary"
+						icon="🎯"
+					/>
 				</div>
 			</div>
 		</div>
 	);
+};
+
+const FeatureCard = ({ title, description, icon }) => (
+	<div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+		<div className="text-4xl mb-4">{icon}</div>
+		<h3 className="text-xl font-bold text-blue-900 mb-2">{title}</h3>
+		<p className="text-blue-800/80">{description}</p>
+	</div>
+);
+
+FeatureCard.propTypes = {
+	title: PropTypes.string.isRequired,
+	description: PropTypes.string.isRequired,
+	icon: PropTypes.string.isRequired
+};
+
+Features.propTypes = {
+	onBack: PropTypes.func.isRequired
 };
 
 export default Features;

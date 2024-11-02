@@ -1,43 +1,40 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+// Initialize the Google Generative AI client
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
 
 export async function generateQuestions(topic, difficulty) {
 	try {
+		if (!import.meta.env.VITE_GOOGLE_API_KEY) {
+			throw new Error('Google API key is not configured');
+		}
+
 		const prompt = `Generate 10 multiple choice questions about ${topic} at ${difficulty} level. 
-    Return ONLY valid JSON with NO markdown formatting or backticks, using this structure:
-    {
-      "questions": [
-        {
-          "question": "string",
-          "options": ["string", "string", "string", "string"],
-          "correct": number,
-          "explanation": "string"
-        }
-      ]
-    }`;
+      Format as JSON with: {"questions":[{"question":"","options":["","","",""],"correct":0}]}. 
+      Keep it simple, no formatting, just raw JSON.`;
 
 		const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 		const result = await model.generateContent(prompt);
-		const response = await result.response;
-		const text = response.text();
 
-		// Clean the response - remove markdown formatting if present
-		const cleanedText = text
-			.replace(/```json\s*/gi, '')
-			.replace(/```\s*$/gi, '')
+		if (!result?.response) {
+			throw new Error('No response from AI');
+		}
+
+		let text = result.response.text();
+		// Basic cleanup
+		text = text.replace(/[\u201C\u201D\u2018\u2019]/g, '"')
+			.replace(/```[^`]*```/g, '')
+			.replace(/\n/g, '')
 			.trim();
 
-		try {
-			const parsed = JSON.parse(cleanedText);
-			return parsed;
-		} catch (parseError) {
-			console.error('JSON Parse Error:', parseError);
-			console.log('Failed text:', cleanedText);
-			throw new Error('Invalid JSON response from AI');
+		const parsed = JSON.parse(text);
+		if (!parsed.questions || !Array.isArray(parsed.questions)) {
+			throw new Error('Invalid response structure');
 		}
+
+		return parsed;
 	} catch (error) {
-		console.error('AI Service Error:', error);
-		throw new Error(`Failed to generate questions: ${error.message}`);
+		console.error('Generation error:', error.message);
+		throw error;
 	}
 }

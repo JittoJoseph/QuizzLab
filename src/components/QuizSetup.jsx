@@ -1,46 +1,30 @@
 // src/components/QuizSetup.jsx
 import React, { useState } from 'react';
 
-const ToggleSwitch = ({ checked, onChange }) => (
-	<div className="flex items-center space-x-3 mt-6 bg-blue-50 p-3 rounded-lg">
-		<button
-			type="button" // Add this to prevent form submission
-			role="switch"
-			aria-checked={checked}
-			onClick={() => onChange(!checked)}
-			className={`relative inline-flex w-10 h-5 rounded-full transition-colors duration-200 ease-in-out
-        ${checked ? 'bg-blue-600' : 'bg-gray-300'}`}
-		>
-			<span
-				className={`absolute top-0.5 left-0.5 inline-block w-4 h-4 rounded-full bg-white 
-        shadow-sm transform transition-transform duration-200 ease-in-out
-        ${checked ? 'translate-x-5' : 'translate-x-0'}`}
-			/>
-		</button>
-		<label className="text-blue-900 text-sm font-medium flex items-center space-x-2">
-			<span>Show instant feedback</span>
-			{checked && (
-				<span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded">
-					Recommended for beginners
-				</span>
-			)}
-		</label>
-	</div>
-);
-
 const QuizSetup = ({ onSubmit }) => {
 	const [formData, setFormData] = useState({
 		topic: '',
-		difficulty: 'intermediate',
-		instantFeedback: false
+		difficulty: 'intermediate'
 	});
 	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState('');
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		if (!formData.topic.trim()) {
+			setError('Please enter a topic');
+			return;
+		}
+
 		setIsLoading(true);
-		await onSubmit(formData);
-		setIsLoading(false);
+		setError('');
+
+		try {
+			await onSubmit(formData);
+		} catch (error) {
+			setError('Failed to generate quiz. Please try again.');
+			setIsLoading(false);
+		}
 	};
 
 	return (
@@ -62,6 +46,12 @@ const QuizSetup = ({ onSubmit }) => {
 						<h2 className="text-2xl md:text-3xl font-bold text-blue-900 mb-6 text-center">
 							Create Your Quiz
 						</h2>
+
+						{error && (
+							<div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg">
+								{error}
+							</div>
+						)}
 
 						<form onSubmit={handleSubmit} className="space-y-6">
 							{/* Topic Input */}
@@ -101,17 +91,13 @@ const QuizSetup = ({ onSubmit }) => {
 								</select>
 							</div>
 
-							{/* Instant Feedback Toggle */}
-							<ToggleSwitch
-								checked={formData.instantFeedback}
-								onChange={(checked) => setFormData({ ...formData, instantFeedback: checked })}
-							/>
+
 
 							{/* Submit Button */}
 							<button
 								type="submit"
 								disabled={isLoading}
-								className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 
+								className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
 									transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								{isLoading ? (

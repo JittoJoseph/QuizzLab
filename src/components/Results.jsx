@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Confetti from 'react-confetti';
 
-const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onRetry, onNewQuiz }) => {
+const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onNewQuiz, onNavigate }) => {
 	const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 	const isExcellentScore = percentage >= 90;
 
@@ -93,10 +93,10 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onRetry, onNe
 						{/* Actions */}
 						<div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-3">
 							<button
-								onClick={onRetry}
+								onClick={() => onNavigate('welcome')}  // New home button
 								className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
 							>
-								Try Again
+								Back to Home
 							</button>
 							<button
 								onClick={onNewQuiz}
@@ -116,8 +116,8 @@ Results.propTypes = {
 	score: PropTypes.number.isRequired,
 	totalQuestions: PropTypes.number.isRequired,
 	topic: PropTypes.string.isRequired,
-	onRetry: PropTypes.func.isRequired,
-	onNewQuiz: PropTypes.func.isRequired
+	onNewQuiz: PropTypes.func.isRequired,
+	onNavigate: PropTypes.func.isRequired
 };
 
 export default Results;

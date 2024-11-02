@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-const Welcome = ({ onStartClick }) => {
+const Welcome = ({ onStartClick, onNavigate }) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	const toggleMenu = () => {
@@ -107,9 +107,13 @@ const Welcome = ({ onStartClick }) => {
 							>
 								Start Learning
 							</button>
-							<button className="border-2 bg-transparent border-blue-600 text-blue-700 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-semibold w-full sm:w-auto">
+							<button
+								onClick={() => onNavigate('features')}
+								className="border-2 bg-transparent border-blue-600 text-blue-700 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-semibold w-full sm:w-auto"
+							>
 								How It Works
 							</button>
+
 						</div>
 					</div>
 
@@ -150,8 +154,10 @@ const Welcome = ({ onStartClick }) => {
 	);
 };
 
+// Welcome.jsx - Update propTypes
 Welcome.propTypes = {
-	onStartClick: PropTypes.func.isRequired
+	onStartClick: PropTypes.func.isRequired,
+	onNavigate: PropTypes.func.isRequired
 };
 
 export default Welcome;

@@ -4,6 +4,8 @@ import QuizSetup from './components/QuizSetup'
 import QuizInterface from './components/QuizInterface'
 import Results from './components/Results'
 import { generateQuestions } from './services/ai';
+import Features from './components/Features';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
 	const [currentPage, setCurrentPage] = useState('welcome')
@@ -62,7 +64,28 @@ function App() {
 
 	return (
 		<>
-			{currentPage === 'welcome' && <Welcome onStartClick={navigateToQuiz} />}
+			<Toaster
+				position="top-center"
+				toastOptions={{
+					duration: 3000,
+					style: {
+						background: '#fff',
+						color: '#1e40af',
+					},
+					success: {
+						icon: '✅',
+					},
+					error: {
+						icon: '❌',
+					},
+				}}
+			/>
+			{currentPage === 'welcome' && (
+				<Welcome
+					onStartClick={navigateToQuiz}
+					onNavigate={setCurrentPage}
+				/>
+			)}
 			{currentPage === 'quiz-setup' && <QuizSetup onSubmit={startQuiz} />}
 			{currentPage === 'quiz' && (
 				<QuizInterface
@@ -81,11 +104,11 @@ function App() {
 			)}
 			{currentPage === 'results' && (
 				<Results
-					score={quizData.score || 0}  // Provide default value
-					totalQuestions={quizData.questions.length || 10}  // Use actual length
-					topic={quizData.topic || 'Quiz'}  // Provide default value
-					onRetry={handleRetry}
+					score={quizData.score || 0}
+					totalQuestions={quizData.questions.length || 10}
+					topic={quizData.topic || 'Quiz'}
 					onNewQuiz={handleNewQuiz}
+					onNavigate={setCurrentPage}
 				/>
 			)}
 			{currentPage === 'features' && (
