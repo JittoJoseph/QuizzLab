@@ -1,7 +1,9 @@
 // src/components/Results.jsx
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import Confetti from 'react-confetti';
+import { AuthContext } from '../context/AuthContext';
+import { saveQuizResult } from '../services/firebase';
 
 const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onNewQuiz, onNavigate }) => {
 	const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
@@ -17,6 +19,17 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onNewQuiz, on
 
 	const handleNewQuiz = () => {
 		onNewQuiz(); // This will trigger resetQuizData and navigation
+	};
+
+	const { user } = useContext(AuthContext);
+
+	const handleSave = async () => {
+		if (!user) return;
+		await saveQuizResult(user.uid, {
+			topic,
+			score,
+			totalQuestions
+		});
 	};
 
 	return (
@@ -109,6 +122,17 @@ const Results = ({ score = 0, totalQuestions = 10, topic = 'Quiz', onNewQuiz, on
 								New Quiz
 							</button>
 						</div>
+						{user && (
+							<button onClick={handleSave} className="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+								Save Result
+							</button>
+						)}
+						{!user && (
+							<div className="mt-4">
+								<p>Sign in to save your progress</p>
+								<LoginButton />
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

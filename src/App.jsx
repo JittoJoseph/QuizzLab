@@ -6,6 +6,7 @@ import Results from './components/Results'
 import { generateQuestions } from './services/ai';
 import Features from './components/Features';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
 	const [currentPage, setCurrentPage] = useState('welcome')
@@ -78,7 +79,7 @@ function App() {
 	}
 
 	return (
-		<>
+		<AuthProvider>
 			<Toaster
 				position="top-center"
 				toastOptions={{
@@ -132,7 +133,7 @@ function App() {
 			{currentPage === 'features' && (
 				<Features onBack={() => setCurrentPage('welcome')} />
 			)}
-		</>
+		</AuthProvider>
 	)
 }
 
