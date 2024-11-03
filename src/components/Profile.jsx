@@ -168,11 +168,16 @@ const Profile = ({ onNavigate }) => {
 				{history.length > 0 && (
 					<div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg mt-8">
 						<h3 className="text-xl font-bold text-blue-900 mb-6">Performance Overview</h3>
-						<div className="h-[400px] w-full">
+						<div className="h-[400px] -mx-6 sm:mx-0"> {/* Negative margin on mobile */}
 							<ResponsiveContainer width="100%" height="100%">
 								<AreaChart
 									data={getChartData(history)}
-									margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+									margin={{
+										top: 20,
+										right: 10,
+										left: 0,
+										bottom: 40 // Increased bottom margin for desktop
+									}}
 								>
 									<defs>
 										<linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
@@ -183,11 +188,12 @@ const Profile = ({ onNavigate }) => {
 									<CartesianGrid strokeDasharray="3 3" stroke="#EFF6FF" />
 									<XAxis
 										dataKey="name"
-										angle={-45}
-										textAnchor="end"
-										height={60}
 										stroke="#1E40AF"
 										fontSize={12}
+										tickMargin={10}
+										interval={0}
+										height={40} // Increased height for text
+										className="hidden sm:block" // Hide on mobile, show on desktop
 									/>
 									<YAxis
 										stroke="#1E40AF"
