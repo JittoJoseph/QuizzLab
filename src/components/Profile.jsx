@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useAuth } from '../context/AuthContext';
 import { getUserHistory } from '../services/firebase';
 import { ArrowLeft, Trophy, Star, Circle } from 'lucide-react'; // Add icons import
-import { Chart } from "react-google-charts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const Profile = ({ onNavigate }) => {
 	const { user } = useAuth();
@@ -28,15 +28,17 @@ const Profile = ({ onNavigate }) => {
 		fetchHistory();
 	}, [user]);
 
-	// Update getChartData function to use latest entries
 	const getChartData = (history) => {
-		const data = [['Quiz', 'Score']];
-		const sortedHistory = [...history].sort((a, b) => b.timestamp - a.timestamp);
-		const recentHistory = sortedHistory.slice(0, 6); // Get latest 6 entries
-		recentHistory.forEach(quiz => {
-			data.push([quiz.topic, quiz.score]);
-		});
-		return data;
+		const sortedHistory = [...history]
+			.sort((a, b) => b.timestamp - a.timestamp)
+			.slice(0, 6)
+			.reverse()
+			.map(quiz => ({
+				name: quiz.topic.length > 20 ? quiz.topic.substring(0, 20) + '...' : quiz.topic,
+				score: quiz.score,
+				average: quiz.totalQuestions / 2 // Adding baseline for comparison
+			}));
+		return sortedHistory;
 	};
 
 	// Add score indicator function
@@ -49,6 +51,19 @@ const Profile = ({ onNavigate }) => {
 			return <Star className="w-5 h-5 text-gray-400" />;
 		} else if (percentage >= 50) {
 			return <Circle className="w-5 h-5 text-amber-700" />;
+		}
+		return null;
+	};
+
+	// Custom Tooltip
+	const CustomTooltip = ({ active, payload, label }) => {
+		if (active && payload && payload.length) {
+			return (
+				<div className="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-blue-100">
+					<p className="text-blue-900 font-semibold mb-1">{label}</p>
+					<p className="text-blue-600">Score: {payload[0].value}</p>
+				</div>
+			);
 		}
 		return null;
 	};
@@ -151,38 +166,46 @@ const Profile = ({ onNavigate }) => {
 				</div>
 
 				{history.length > 0 && (
-					<div className="mt-8">
-						<h3 className="text-xl font-bold text-blue-900 mb-4">Performance Overview</h3>
-						{chartLoading && (
-							<div className="flex justify-center py-8">
-								<div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-							</div>
-						)}
-						<div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-							<Chart
-								chartType="LineChart"
-								data={getChartData(history)}
-								options={{
-									title: 'Quiz Performance',
-									curveType: 'function',
-									legend: { position: 'none' },
-									colors: ['#2563EB'],
-									backgroundColor: 'transparent',
-									vAxis: {
-										viewWindow: {
-											min: 0,
-											max: 10
-										},
-										ticks: [0, 5, 10], // Only show these values
-										gridlines: {
-											count: 3 // Matches number of ticks
-										}
-									}
-								}}
-								width="100%"
-								height="400px"
-								onLoad={() => setChartLoading(false)}
-							/>
+					<div className="bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg mt-8">
+						<h3 className="text-xl font-bold text-blue-900 mb-6">Performance Overview</h3>
+						<div className="h-[400px] w-full">
+							<ResponsiveContainer width="100%" height="100%">
+								<AreaChart
+									data={getChartData(history)}
+									margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+								>
+									<defs>
+										<linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
+											<stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
+											<stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+										</linearGradient>
+									</defs>
+									<CartesianGrid strokeDasharray="3 3" stroke="#EFF6FF" />
+									<XAxis
+										dataKey="name"
+										angle={-45}
+										textAnchor="end"
+										height={60}
+										stroke="#1E40AF"
+										fontSize={12}
+									/>
+									<YAxis
+										stroke="#1E40AF"
+										domain={[0, 10]}
+										ticks={[0, 2, 4, 6, 8, 10]}
+									/>
+									<Tooltip content={<CustomTooltip />} />
+									<Area
+										type="monotone"
+										dataKey="score"
+										stroke="#3B82F6"
+										strokeWidth={3}
+										fill="url(#scoreGradient)"
+										animationDuration={1000}
+										activeDot={{ r: 6, fill: "#2563EB" }}
+									/>
+								</AreaChart>
+							</ResponsiveContainer>
 						</div>
 					</div>
 				)}
