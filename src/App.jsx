@@ -20,7 +20,6 @@ function App() {
 		answers: []
 	});
 	const [isLoading, setIsLoading] = useState(false);
-	const [pendingResult, setPendingResult] = useState(null);
 
 	const resetQuizData = () => {
 		setQuizData({
@@ -60,21 +59,6 @@ function App() {
 	};
 
 	const handleQuizComplete = () => {
-		// Only set pendingResult once when quiz completes
-		if (!quizData?.topic) {
-			console.error('Quiz data incomplete:', quizData);
-			return;
-		}
-
-		const result = {
-			topic: quizData.topic,
-			score: quizData.score,
-			totalQuestions: quizData.questions.length,
-			difficulty: quizData.difficulty || 'beginner',
-			timestamp: Date.now()
-		};
-
-		setPendingResult(result);
 		setCurrentPage('results');
 	};
 
@@ -112,8 +96,6 @@ function App() {
 						difficulty={quizData.difficulty || 'beginner'}
 						onNewQuiz={navigateToQuiz}
 						onNavigate={setCurrentPage}
-						pendingResult={pendingResult}
-						setPendingResult={setPendingResult}
 					/>
 				)}
 				{currentPage === 'profile' && (

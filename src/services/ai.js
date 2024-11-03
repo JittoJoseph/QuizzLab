@@ -10,10 +10,18 @@ export async function generateQuestions(topic, difficulty) {
 		}
 
 		const prompt = `Generate 10 multiple choice questions about ${topic} at ${difficulty} level. 
-      Format as JSON with: {"questions":[{"question":"","options":["","","",""],"correct":0}]}. 
-      Keep it simple, no formatting, just raw JSON.`;
+		  Format as JSON with: {"questions":[{"question":"","options":["","","",""],"correct":0}]}. 
+		  Keep it simple, no formatting, just raw JSON.`;
 
-		const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+		// Try Gemini 1.5 Flash first, fallback to 1.5 Pro
+		let model;
+		try {
+			model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+		} catch (error) {
+			console.log('Falling back to Gemini 1.5 Pro');
+			model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+		}
+
 		const result = await model.generateContent(prompt);
 
 		if (!result?.response) {

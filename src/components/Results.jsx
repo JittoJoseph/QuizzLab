@@ -12,8 +12,6 @@ const Results = ({
 	difficulty,
 	onNewQuiz,
 	onNavigate,
-	pendingResult,
-	setPendingResult
 }) => {
 	const [saving, setSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
@@ -25,7 +23,6 @@ const Results = ({
 
 	const googleColors = ['#4285F4', '#DB4437', '#F4B400', '#0F9D58'];
 
-	// Single save function
 	const saveResult = async () => {
 		if (saving || !user) return;
 
@@ -50,16 +47,10 @@ const Results = ({
 	const handleSignIn = async () => {
 		try {
 			await login();
-			// Only save if not already saved
-			if (!saved) {
-				await saveResult();
-			}
 		} catch (error) {
 			console.error('Login error:', error);
 		}
 	};
-
-	// Remove useEffect auto-save completely
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
