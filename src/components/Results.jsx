@@ -1,5 +1,4 @@
-// src/components/Results.jsx
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Add useRef here
 import PropTypes from 'prop-types';
 import Confetti from 'react-confetti';
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +12,9 @@ const Results = ({
 	onNewQuiz,
 	onNavigate,
 }) => {
+	// Add saveAttempted ref before other state declarations
+	const saveAttempted = useRef(false);
+
 	const [saving, setSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
 	const [saved, setSaved] = useState(false);
@@ -20,21 +22,21 @@ const Results = ({
 
 	const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 	const isExcellentScore = percentage >= 90;
-
 	const googleColors = ['#4285F4', '#DB4437', '#F4B400', '#0F9D58'];
 
-	const saveResult = async () => {
-		if (saving || !user) return;
+	const saveResult = async (currentUser) => {
+		if (!currentUser || saving || saved) return;
 
 		try {
 			setSaving(true);
-			await saveQuizResult(user.uid, {
+			const quizResult = {
 				topic,
 				score,
 				totalQuestions,
 				difficulty,
 				timestamp: Date.now()
-			});
+			};
+			await saveQuizResult(currentUser.uid, quizResult);
 			setSaved(true);
 		} catch (error) {
 			console.error('Save error:', error);
@@ -43,6 +45,26 @@ const Results = ({
 			setSaving(false);
 		}
 	};
+
+	useEffect(() => {
+		let mounted = true;
+
+		const save = async () => {
+			// Check saveAttempted.current here
+			if (user && !saving && !saved && !saveAttempted.current) {
+				saveAttempted.current = true;
+				if (mounted) {
+					await saveResult(user);
+				}
+			}
+		};
+
+		save();
+
+		return () => {
+			mounted = false;
+		};
+	}, [user]);
 
 	const handleSignIn = async () => {
 		try {
@@ -65,6 +87,7 @@ const Results = ({
 					height={window.innerHeight}
 				/>
 			)}
+
 			{/* Header */}
 			<div className="px-4 md:px-8 py-6">
 				<div className="flex items-center space-x-2">
@@ -130,7 +153,7 @@ const Results = ({
 						{/* Actions */}
 						<div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-3">
 							<button
-								onClick={() => onNavigate('welcome')}  // New home button
+								onClick={() => onNavigate('welcome')}
 								className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
 							>
 								Back to Home
@@ -161,21 +184,15 @@ const Results = ({
 										Sign in with Google
 									</button>
 								</div>
-							) : !saved ? (
-								<div className="text-center">
-									<button
-										onClick={saveResult}
-										disabled={saving}
-										className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-									>
-										{saving ? 'Saving...' : 'Save Result'}
-									</button>
+							) : saving ? (
+								<div className="text-blue-600 font-medium text-center">
+									Saving your result...
 								</div>
-							) : (
+							) : saved ? (
 								<div className="text-green-600 font-medium text-center">
 									Result saved successfully!
 								</div>
-							)}
+							) : null}
 
 							{saveError && (
 								<div className="text-red-600 font-medium text-center">
@@ -197,8 +214,6 @@ Results.propTypes = {
 	difficulty: PropTypes.string,
 	onNewQuiz: PropTypes.func.isRequired,
 	onNavigate: PropTypes.func.isRequired,
-	pendingResult: PropTypes.object,
-	setPendingResult: PropTypes.func
 };
 
 export default Results;
