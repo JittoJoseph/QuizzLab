@@ -23,7 +23,16 @@ const Results = ({
 	const googleColors = ['#4285F4', '#DB4437', '#F4B400', '#0F9D58'];
 
 	const saveResult = async (currentUser) => {
-		if (!currentUser || saving || saved) return;
+		// Early return if no user, already saving/saved, or no uid
+		if (!currentUser?.uid || saving || saved) {
+			console.log('Save conditions not met:', {
+				hasUser: !!currentUser,
+				hasUid: !!currentUser?.uid,
+				saving,
+				saved
+			});
+			return;
+		}
 
 		try {
 			setSaving(true);
@@ -34,6 +43,8 @@ const Results = ({
 				difficulty,
 				timestamp: Date.now()
 			};
+
+			// Only save if we have a valid uid
 			await saveQuizResult(currentUser.uid, quizResult);
 			setSaved(true);
 		} catch (error) {
@@ -63,19 +74,47 @@ const Results = ({
 		};
 	}, [user]);
 
-	const handleProfileClick = async () => {
-		if (!user) {
-			try {
-				await login();
-				// Save current quiz after successful login
-				await saveResult(await auth.currentUser);
-				onNavigate('profile');
-			} catch (error) {
-				console.error('Login error:', error);
+	const handleSignIn = async () => {
+		try {
+			const loggedInUser = await login();
+			if (loggedInUser) {
+				await saveResult(loggedInUser);
 			}
-		} else {
-			onNavigate('profile');
+		} catch (error) {
+			console.error('Login error:', error);
 		}
+	};
+
+	const renderActionButtons = () => {
+		return (
+			<div className="space-y-4">
+				<button
+					onClick={onNewQuiz}
+					className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 
+                  transition-colors font-semibold"
+				>
+					Try Another Quiz
+				</button>
+
+				{user ? (
+					<button
+						onClick={() => onNavigate('profile')}
+						className="w-full bg-white border-2 border-blue-600 text-blue-600 py-3 
+                  rounded-lg hover:bg-blue-50 transition-colors font-semibold"
+					>
+						View Profile
+					</button>
+				) : (
+					<button
+						onClick={handleSignIn}
+						className="w-full bg-white border-2 border-blue-600 text-blue-600 py-3 
+                  rounded-lg hover:bg-blue-50 transition-colors font-semibold"
+					>
+						Sign in to Save Results
+					</button>
+				)}
+			</div>
+		);
 	};
 
 	return (
@@ -174,27 +213,11 @@ const Results = ({
 						</div>
 
 						{/* Actions */}
-						<div className="space-y-4">
-							<button
-								onClick={onNewQuiz}
-								className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 
-                  transition-colors font-semibold"
-							>
-								Try Another Quiz
-							</button>
-
-							<button
-								onClick={handleProfileClick}
-								className="w-full bg-white border-2 border-blue-600 text-blue-600 py-3 
-                  rounded-lg hover:bg-blue-50 transition-colors font-semibold"
-							>
-								{user ? 'View Profile' : 'Sign in to Save Results'}
-							</button>
-						</div>
+						{renderActionButtons()}
 
 						{/* Save Status */}
 						<div className="mt-4">
-							{!user ? null : saving ? (
+							{saving ? (
 								<div className="text-blue-600 font-medium text-center">
 									Saving your result...
 								</div>

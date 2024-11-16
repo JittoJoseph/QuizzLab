@@ -62,6 +62,25 @@ async function fetchWithRetry(prompt, maxAttempts = 2) {
 	}
 }
 
+function shuffleOptions(question) {
+	// Create array of option objects with their original indices
+	const optionsWithIndex = question.options.map((text, index) => ({
+		text,
+		isCorrect: index === question.correct
+	}));
+
+	// Fisher-Yates shuffle
+	for (let i = optionsWithIndex.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[optionsWithIndex[i], optionsWithIndex[j]] = [optionsWithIndex[j], optionsWithIndex[i]];
+	}
+
+	// Update question with shuffled options
+	question.options = optionsWithIndex.map(opt => opt.text);
+	question.correct = optionsWithIndex.findIndex(opt => opt.isCorrect);
+
+	return question;
+}
 
 export async function generateQuestions(topic, difficulty) {
 	try {
@@ -69,12 +88,9 @@ export async function generateQuestions(topic, difficulty) {
 			throw new Error('Google API key is not configured');
 		}
 
-		if (!topic || !difficulty) {
-			throw new Error('Topic and difficulty are required');
-		}
-
 		const prompt = `Generate 10 multiple choice questions about ${topic} at ${difficulty} level.
-      Format as JSON with: {"questions":[{"question":"","options":["","","",""],"correct":0}]}.`;
+		Format as JSON with: {"questions":[{"question":"","options":["","","",""],"correct":0}]}.
+		Ensure all options are simple strings, not arrays.`;
 
 		console.log('Starting question generation...');
 		const text = await fetchWithRetry(prompt);
@@ -85,48 +101,54 @@ export async function generateQuestions(topic, difficulty) {
 			.replace(/\n/g, '')
 			.replace(/,\s*([}\]])/g, '$1')
 			.replace(/([{,]\s*)(\w+)(:)/g, '$1"$2"$3')
+			// Fix nested arrays in options
+			.replace(/\[\s*\[(.*?)\]\s*,/g, '["$1",')
 			.trim();
 
 		if (!processedText.startsWith('{') || !processedText.endsWith('}')) {
 			throw new QuestionGenerationError('Invalid JSON structure in AI response');
 		}
 
-		const parsed = JSON.parse(processedText);
-		if (!parsed.questions?.length) {
-			throw new QuestionGenerationError('No questions in AI response');
+		try {
+			const parsed = JSON.parse(processedText);
+
+			// Validate questions
+			if (!parsed.questions?.length) {
+				throw new QuestionGenerationError('No questions in AI response');
+			}
+
+			// Validate and sanitize each question
+			parsed.questions = parsed.questions.map((q, index) => {
+				if (!Array.isArray(q.options) || q.options.length !== 4) {
+					throw new QuestionGenerationError(`Invalid options array in question ${index + 1}`);
+				}
+
+				// Ensure all options are strings
+				q.options = q.options.map(opt => {
+					if (Array.isArray(opt)) {
+						return opt[0] || '';
+					}
+					return String(opt);
+				});
+
+				if (typeof q.correct !== 'number' || q.correct < 0 || q.correct >= q.options.length) {
+					throw new QuestionGenerationError(`Invalid correct answer index in question ${index + 1}`);
+				}
+
+				// Shuffle options after validation
+				return shuffleOptions(q);
+			});
+
+			return parsed;
+
+		} catch (parseError) {
+			console.error('JSON Parse Error:', parseError);
+			console.error('Processed Text:', processedText);
+			throw new QuestionGenerationError(`Invalid JSON format: ${parseError.message}`);
 		}
 
-		const processedQuestions = parsed.questions.map((q, index) => {
-			if (!q.question || !Array.isArray(q.options) || q.options.length !== 4) {
-				throw new QuestionGenerationError(`Invalid question format at index ${index}`);
-			}
-
-			const optionPairs = q.options.map((text, idx) => ({
-				text,
-				isCorrect: idx === q.correct
-			}));
-
-			// Fisher-Yates shuffle
-			for (let i = optionPairs.length - 1; i > 0; i--) {
-				const j = Math.floor(Math.random() * (i + 1));
-				[optionPairs[i], optionPairs[j]] = [optionPairs[j], optionPairs[i]];
-			}
-
-			return {
-				...q,
-				options: optionPairs.map(pair => pair.text),
-				correct: optionPairs.findIndex(pair => pair.isCorrect)
-			};
-		});
-
-		return { questions: processedQuestions };
-
 	} catch (error) {
-		const errorMessage = error instanceof QuestionGenerationError ?
-			error.message :
-			'Failed to generate questions: ' + error.message;
-
-		console.error('Generation error:', errorMessage);
+		console.error('Generation error:', error);
 		throw error;
 	}
 }
