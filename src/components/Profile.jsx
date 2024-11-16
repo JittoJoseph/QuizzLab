@@ -5,6 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { getUserHistory } from '../services/firebase';
 import { ArrowLeft, Trophy, Star, Circle } from 'lucide-react'; // Add icons import
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { deleteDoc, doc, query, collection, where, orderBy, limit, getDocs, writeBatch } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 const Profile = ({ onNavigate }) => {
 	const { user } = useAuth();
@@ -13,11 +15,41 @@ const Profile = ({ onNavigate }) => {
 	const [chartLoading, setChartLoading] = useState(true);
 	const [isExpanded, setIsExpanded] = useState(false);
 
+	const cleanupOldQuizzes = async (quizzes) => {
+		if (!user?.uid || quizzes.length <= 10) return;
+
+		try {
+			const oldQuizzesQuery = query(
+				collection(db, 'quizResults'),
+				where('userId', '==', user.uid),
+				orderBy('timestamp', 'asc'),
+				limit(quizzes.length - 10)
+			);
+
+			const snapshot = await getDocs(oldQuizzesQuery);
+
+			if (snapshot.empty) return;
+
+			const batch = writeBatch(db);
+			snapshot.docs.forEach(doc => {
+				batch.delete(doc.ref);
+			});
+
+			await batch.commit();
+			console.log(`Cleaned up ${snapshot.size} old quizzes for user ${user.uid}`);
+		} catch (error) {
+			console.error('Cleanup error:', error);
+		}
+	};
+
 	useEffect(() => {
 		const fetchHistory = async () => {
 			try {
 				const results = await getUserHistory(user.uid);
 				setHistory(results);
+
+				// Cleanup after loading history
+				await cleanupOldQuizzes(results);
 			} catch (error) {
 				console.error('Failed to fetch history:', error);
 			} finally {
