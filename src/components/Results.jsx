@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // Add useRef here
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Confetti from 'react-confetti';
 import { useAuth } from '../context/AuthContext';
@@ -12,9 +12,7 @@ const Results = ({
 	onNewQuiz,
 	onNavigate,
 }) => {
-	// Add saveAttempted ref before other state declarations
 	const saveAttempted = useRef(false);
-
 	const [saving, setSaving] = useState(false);
 	const [saveError, setSaveError] = useState(null);
 	const [saved, setSaved] = useState(false);
@@ -50,7 +48,6 @@ const Results = ({
 		let mounted = true;
 
 		const save = async () => {
-			// Check saveAttempted.current here
 			if (user && !saving && !saved && !saveAttempted.current) {
 				saveAttempted.current = true;
 				if (mounted) {
@@ -66,11 +63,18 @@ const Results = ({
 		};
 	}, [user]);
 
-	const handleSignIn = async () => {
-		try {
-			await login();
-		} catch (error) {
-			console.error('Login error:', error);
+	const handleProfileClick = async () => {
+		if (!user) {
+			try {
+				await login();
+				// Save current quiz after successful login
+				await saveResult(await auth.currentUser);
+				onNavigate('profile');
+			} catch (error) {
+				console.error('Login error:', error);
+			}
+		} else {
+			onNavigate('profile');
 		}
 	};
 
@@ -88,9 +92,16 @@ const Results = ({
 				/>
 			)}
 
-			{/* Header */}
+			{/* Header with Navigation */}
 			<div className="px-4 md:px-8 py-6">
-				<div className="flex items-center space-x-2">
+				<div
+					onClick={() => {
+						// Reset quiz state if needed
+						if (onNewQuiz) onNewQuiz();
+						onNavigate('welcome');
+					}}
+					className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity w-fit"
+				>
 					<div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
 						<span className="text-white font-bold text-xl">Q</span>
 					</div>
@@ -134,57 +145,56 @@ const Results = ({
 							</svg>
 						</div>
 
-						{/* Stats */}
-						<div className="grid grid-cols-2 gap-4 mb-8">
-							<div className="bg-blue-50 rounded-xl p-4">
-								<div className="text-blue-800">Correct Answers</div>
-								<div className="text-2xl font-bold text-blue-900">
-									{score} / {totalQuestions}
+						{/* Score Details */}
+						<div className="mb-8 space-y-4">
+							<p className="text-blue-800 text-lg">
+								You scored <span className="font-bold">{score}</span> out of{' '}
+								<span className="font-bold">{totalQuestions}</span>
+							</p>
+
+							<div className="grid grid-cols-2 gap-4">
+								{/* Topic Box */}
+								<div className="bg-blue-50/80 rounded-xl p-4 border border-blue-100 shadow-sm 
+									hover:shadow-md transition-shadow duration-200">
+									<p className="text-blue-600/80 text-sm mb-1">Topic</p>
+									<p className="text-blue-900 font-semibold capitalize text-lg truncate">
+										{topic}
+									</p>
 								</div>
-							</div>
-							<div className="bg-blue-50 rounded-xl p-4">
-								<div className="text-blue-800">Topic</div>
-								<div className="text-2xl font-bold text-blue-900 truncate">
-									{topic}
+
+								{/* Difficulty Box */}
+								<div className="bg-blue-50/80 rounded-xl p-4 border border-blue-100 shadow-sm 
+									hover:shadow-md transition-shadow duration-200">
+									<p className="text-blue-600/80 text-sm mb-1">Difficulty</p>
+									<p className="text-blue-900 font-semibold capitalize text-lg">
+										{difficulty}
+									</p>
 								</div>
 							</div>
 						</div>
 
 						{/* Actions */}
-						<div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-3">
-							<button
-								onClick={() => onNavigate('welcome')}
-								className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-							>
-								Back to Home
-							</button>
-							<button
-								onClick={() => onNavigate('profile')}
-								className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-							>
-								View Profile
-							</button>
+						<div className="space-y-4">
 							<button
 								onClick={onNewQuiz}
-								className="px-6 py-3 border-2 border-blue-600 text-blue-700 bg-transparent rounded-lg hover:bg-blue-50 transition-colors"
+								className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 
+                  transition-colors font-semibold"
 							>
-								New Quiz
+								Try Another Quiz
+							</button>
+
+							<button
+								onClick={handleProfileClick}
+								className="w-full bg-white border-2 border-blue-600 text-blue-600 py-3 
+                  rounded-lg hover:bg-blue-50 transition-colors font-semibold"
+							>
+								{user ? 'View Profile' : 'Sign in to Save Results'}
 							</button>
 						</div>
 
-						{/* Auth/Save Section */}
-						<div className="mt-6 space-y-4">
-							{!user ? (
-								<div className="p-4 bg-blue-50 rounded-lg text-center">
-									<p className="text-blue-800 mb-2">Sign in to save your progress</p>
-									<button
-										onClick={handleSignIn}
-										className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-									>
-										Sign in with Google
-									</button>
-								</div>
-							) : saving ? (
+						{/* Save Status */}
+						<div className="mt-4">
+							{!user ? null : saving ? (
 								<div className="text-blue-600 font-medium text-center">
 									Saving your result...
 								</div>

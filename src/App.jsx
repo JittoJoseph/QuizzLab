@@ -72,7 +72,12 @@ function App() {
 				{currentPage === 'features' && (  // Add this block
 					<Features onNavigate={setCurrentPage} />
 				)}
-				{currentPage === 'quiz-setup' && <QuizSetup onSubmit={startQuiz} />}
+				{currentPage === 'quiz-setup' && (
+					<QuizSetup
+						onSubmit={startQuiz}
+						onNavigate={setCurrentPage}
+					/>
+				)}
 				{currentPage === 'quiz' && (
 					<QuizInterface
 						onComplete={handleQuizComplete}

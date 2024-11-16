@@ -1,7 +1,8 @@
 // src/components/QuizSetup.jsx
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
-const QuizSetup = ({ onSubmit }) => {
+const QuizSetup = ({ onSubmit, onNavigate }) => {
 	const [formData, setFormData] = useState({
 		topic: '',
 		difficulty: 'intermediate'
@@ -31,7 +32,10 @@ const QuizSetup = ({ onSubmit }) => {
 		<div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col">
 			{/* Header */}
 			<div className="px-4 md:px-8 py-6">
-				<div className="flex items-center space-x-2">
+				<div
+					onClick={() => onNavigate('welcome')}
+					className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity w-fit"
+				>
 					<div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
 						<span className="text-white font-bold text-xl">Q</span>
 					</div>
@@ -125,6 +129,11 @@ const QuizSetup = ({ onSubmit }) => {
 			</div>
 		</div>
 	);
+};
+
+QuizSetup.propTypes = {
+	onSubmit: PropTypes.func.isRequired,
+	onNavigate: PropTypes.func.isRequired
 };
 
 export default QuizSetup;
