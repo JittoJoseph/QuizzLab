@@ -8,6 +8,7 @@ import Results from './components/Results';
 import Profile from './components/Profile';
 import Features from './components/Features'; // Add this import
 import { generateQuestions } from './services/ai';
+import { logAnalyticsEvent } from './config/firebase';
 
 function App() {
 	const [currentPage, setCurrentPage] = useState('welcome');
@@ -59,6 +60,11 @@ function App() {
 	};
 
 	const handleQuizComplete = () => {
+		logAnalyticsEvent('quiz_completed', {
+			topic: quizData.topic,
+			difficulty: quizData.difficulty,
+			score: quizData.score
+		});
 		setCurrentPage('results');
 	};
 
