@@ -15,7 +15,7 @@ class QuestionGenerationError extends Error {
 }
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
-const REQUEST_TIMEOUT = 15000; // 15 seconds
+const REQUEST_TIMEOUT = 18000; // 15 seconds
 
 async function fetchWithTimeout(promise, timeout) {
 	return Promise.race([
