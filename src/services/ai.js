@@ -15,7 +15,7 @@ class QuestionGenerationError extends Error {
 }
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
-const REQUEST_TIMEOUT = 18000; // 15 seconds
+const REQUEST_TIMEOUT = 18000; // 18 seconds
 
 async function fetchWithTimeout(promise, timeout) {
 	return Promise.race([
@@ -45,19 +45,18 @@ async function generateWithModel(modelName, prompt) {
 	return result.response.text();
 }
 
+// In ai.js - update fetchWithRetry
 async function fetchWithRetry(prompt, maxAttempts = 2) {
-	// Try Pro model first
 	try {
 		return await generateWithModel("gemini-1.5-flash", prompt);
-	} catch (error) {
-		console.error('Pro model failed:', error.message);
-
-		// Only try Flash model if Pro fails
+	} catch (flashError) {
 		try {
 			return await generateWithModel("gemini-1.5-pro", prompt);
-		} catch (flashError) {
-			console.error('Flash model failed:', flashError.message);
-			throw new QuestionGenerationError('All models failed to generate response');
+		} catch (proError) {
+			// Throw a silent error that will just trigger UI state change
+			const error = new Error();
+			error.silent = true; // Add flag to prevent logging
+			throw error;
 		}
 	}
 }

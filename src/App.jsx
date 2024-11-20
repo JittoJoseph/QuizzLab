@@ -53,7 +53,7 @@ function App() {
 			});
 			setCurrentPage('quiz');
 		} catch (error) {
-			console.error('Failed to generate questions:', error);
+			throw error;
 		} finally {
 			setIsLoading(false);
 		}

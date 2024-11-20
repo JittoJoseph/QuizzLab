@@ -1,6 +1,7 @@
 // src/components/QuizSetup.jsx
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { RefreshCw, AlertCircle } from 'lucide-react';
 
 const QuizSetup = ({ onSubmit, onNavigate }) => {
 	const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const QuizSetup = ({ onSubmit, onNavigate }) => {
 	});
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState('');
+	const [hasFailed, setHasFailed] = useState(false);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -19,11 +21,17 @@ const QuizSetup = ({ onSubmit, onNavigate }) => {
 
 		setIsLoading(true);
 		setError('');
+		setHasFailed(false);
 
 		try {
 			await onSubmit(formData);
 		} catch (error) {
-			setError('Failed to generate quiz. Please try again.');
+			// Only log if not silent
+			if (!error.silent) {
+				console.error('Quiz generation failed:', error);
+			}
+			setHasFailed(true);
+		} finally {
 			setIsLoading(false);
 		}
 	};
@@ -70,8 +78,8 @@ const QuizSetup = ({ onSubmit, onNavigate }) => {
 									onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
 									required
 									className="w-full px-4 py-3 rounded-lg border border-blue-200 
-										focus:outline-none focus:ring-2 focus:ring-blue-500 
-										bg-transparent text-blue-900"
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    bg-transparent text-blue-900"
 									placeholder="Enter any topic (e.g., 'Photosynthesis')"
 								/>
 							</div>
@@ -86,8 +94,8 @@ const QuizSetup = ({ onSubmit, onNavigate }) => {
 									value={formData.difficulty}
 									onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
 									className="w-full px-4 py-3 rounded-lg border border-blue-200 
-										focus:outline-none focus:ring-2 focus:ring-blue-500 
-										bg-transparent text-blue-900"
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 
+                    bg-transparent text-blue-900"
 								>
 									<option value="beginner">Beginner</option>
 									<option value="intermediate">Intermediate</option>
@@ -95,35 +103,36 @@ const QuizSetup = ({ onSubmit, onNavigate }) => {
 								</select>
 							</div>
 
-
-
 							{/* Submit Button */}
-							<button
-								type="submit"
-								disabled={isLoading}
-								className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-									transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-							>
-								{isLoading ? (
-									<div className="flex items-center justify-center space-x-2">
-										<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-										<span>Generating Quiz...</span>
-									</div>
-								) : (
-									'Generate Quiz'
-								)}
-							</button>
-						</form>
+							<div className="space-y-4">
+								<button
+									type="submit"
+									disabled={isLoading && !hasFailed}
+									className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                  transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									{isLoading && !hasFailed ? (
+										<div className="flex items-center justify-center space-x-2">
+											<div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+											<span>Generating Quiz...</span>
+										</div>
+									) : hasFailed ? (
+										<div className="flex items-center justify-center space-x-2">
+											<AlertCircle className="w-5 h-5" />
+											<span>Failed, Try Again</span>
+										</div>
+									) : (
+										'Generate Quiz'
+									)}
+								</button>
 
-						{/* Tips */}
-						<div className="mt-8 p-4 bg-blue-50 rounded-lg">
-							<h3 className="text-blue-900 font-semibold mb-2">Tips:</h3>
-							<ul className="text-blue-800 text-sm space-y-1">
-								<li>• Be specific with your topic for better questions</li>
-								<li>• Choose difficulty based on your knowledge level</li>
-								<li>• Quiz will contain 10 multiple choice questions</li>
-							</ul>
-						</div>
+								{hasFailed && (
+									<p className="text-center text-blue-500/70 text-sm">
+										All models busy
+									</p>
+								)}
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
