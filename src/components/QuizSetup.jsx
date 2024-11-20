@@ -128,7 +128,7 @@ const QuizSetup = ({ onSubmit, onNavigate }) => {
 
 								{hasFailed && (
 									<p className="text-center text-blue-500/70 text-sm">
-										All models busy
+										All models are currently busy
 									</p>
 								)}
 							</div>
