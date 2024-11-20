@@ -48,13 +48,13 @@ async function generateWithModel(modelName, prompt) {
 async function fetchWithRetry(prompt, maxAttempts = 2) {
 	// Try Pro model first
 	try {
-		return await generateWithModel("gemini-1.5-pro", prompt);
+		return await generateWithModel("gemini-1.5-flash", prompt);
 	} catch (error) {
 		console.error('Pro model failed:', error.message);
 
 		// Only try Flash model if Pro fails
 		try {
-			return await generateWithModel("gemini-1.5-flash", prompt);
+			return await generateWithModel("gemini-1.5-pro", prompt);
 		} catch (flashError) {
 			console.error('Flash model failed:', flashError.message);
 			throw new QuestionGenerationError('All models failed to generate response');
