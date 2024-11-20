@@ -82,15 +82,35 @@ function shuffleOptions(question) {
 	return question;
 }
 
+const generateQuizPrompt = (topic, difficulty) => `Create a ${difficulty} level quiz about ${topic}.
+
+Generate 10 multiple choice questions where:
+- Each question tests real understanding of the topic
+- All options are clearly written and unambiguous
+- Only one option is correct
+- Each question has exactly 4 distinct options
+- No "all/none of the above" options
+- Options are realistic and plausible
+
+Format strictly as:
+{
+  "questions": [
+    {
+      "question": "Complete question text?",
+      "options": ["Correct answer", "Wrong 1", "Wrong 2", "Wrong 3"],
+      "correct": 0
+    }
+  ]
+}
+
+Ensure all text is properly formatted strings. The "correct" index (0-3) must point to the correct option.`;
+
 export async function generateQuestions(topic, difficulty) {
 	try {
 		if (!import.meta.env.VITE_GOOGLE_API_KEY) {
 			throw new Error('Google API key is not configured');
 		}
-
-		const prompt = `Generate 10 multiple choice questions about ${topic} at ${difficulty} level.
-		Format as JSON with: {"questions":[{"question":"","options":["","","",""],"correct":0}]}.
-		Ensure all options are simple strings, not arrays.`;
+		const prompt = generateQuizPrompt(topic, difficulty);
 
 		console.log('Starting question generation...');
 		const text = await fetchWithRetry(prompt);
