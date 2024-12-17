@@ -48,10 +48,10 @@ async function generateWithModel(modelName, prompt) {
 // In ai.js - update fetchWithRetry
 async function fetchWithRetry(prompt, maxAttempts = 2) {
 	try {
-		return await generateWithModel("gemini-1.5-flash-002", prompt);
+		return await generateWithModel("gemini-1.5-flash", prompt);
 	} catch (flashError) {
 		try {
-			return await generateWithModel("gemini-1.5-pro-002", prompt);
+			return await generateWithModel("gemini-1.5-flash-8b", prompt);
 		} catch (proError) {
 			// Throw a silent error that will just trigger UI state change
 			const error = new Error();
